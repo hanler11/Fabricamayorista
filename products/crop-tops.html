@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Redirigiendo a Crop Tops</title>
+    <meta http-equiv="refresh" content="0;url=../crop-tops.html">
+    <style>body{font-family:system-ui,Arial;margin:60px;text-align:center;color:#0f1724}a{color:#3b82f6}</style>
+  </head>
+  <body>
+    <h2>Redirigiendo a la página de Crop Tops...</h2>
+    <p>Si no redirige automáticamente, <a href="../crop-tops.html">haz clic aquí</a>.</p>
+  </body>
+</html>
+      for (let i = 9; i <= 25; i++) {
+        const id = pad(i);
+        products.push({
+          id,
+          name: `Crop Top ${id}`,
+          image: `../Images/${id}/${id}.jpg`,
+          price: { retail: 450 },
+        });
+      }
+      const container = document.getElementById("products");
+      products.forEach((p) => {
+        const card = document.createElement("article");
+        card.className = "product";
+        card.innerHTML = `<div class="thumb-container"><img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/360x360?text=Sin+imagen'"></div><div class="product-info"><h3>${p.name}</h3></div>`;
+        container.appendChild(card);
+      });
+    </script>
+  </body>
+</html>

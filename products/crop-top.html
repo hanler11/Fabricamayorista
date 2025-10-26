@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Detalle Crop Top — FabricaMayorista</title>
+    <style>
+      :root {
+        --brand-red: #e63946;
+        --brand-pink: #ff6b9a;
+        --primary-grad: linear-gradient(90deg, #4f46e5, #6d28d9);
+        --muted-plate: #f1f5f9;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 22px auto;
+        padding: 18px;
+        display: flex;
+        justify-content: center;
+      }
+      .product-wrap {
+        display: grid;
+        grid-template-columns: 70% 30%;
+        gap: 28px;
+        background: transparent;
+        padding: 12px 8px;
+        border-radius: 10px;
+        box-shadow: none;
+        align-items: start;
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .img-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: auto;
+        background: transparent;
+        border-radius: 8px;
+        padding: 6px;
+        max-width: 760px;
+        margin: 0 auto;
+        position: relative;
+        cursor: zoom-in;
+      }
+      .img-wrap img {
+        width: 100%;
+        height: auto;
+        max-height: 84vh;
+        object-fit: contain;
+        transition: transform 160ms ease;
+        border-radius: 8px;
+        box-shadow: 0 14px 40px rgba(2, 6, 23, 0.12);
+      }
+      .img-wrap img:hover {
+        transform: scale(1.03);
+      }
+      .cart-badge-inline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        background: #000000; /* black */
+        color: #ffffff;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin-left: 6px;
+        border: 2px solid rgba(255, 255, 255, 0.08);
+      }
+      .img-zoom-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        opacity: 0;
+        transform: translateY(6px);
+        background: rgba(255, 255, 255, 0.9);
+        color: #111827;
+        border: 1px solid #e5e7eb;
+        border-radius: 999px;
+        padding: 8px 10px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+      .img-wrap:hover .img-zoom-btn {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .img-zoom-hint {
+        display: none;
+      }
+      .magnifier-lens {
+        position: absolute;
+        pointer-events: none;
+        width: 140px;
+        height: 140px;
+        border-radius: 999px;
+        box-shadow: 0 12px 36px rgba(2, 6, 23, 0.22);
+        border: 3px solid rgba(255, 255, 255, 0.95);
+        background-repeat: no-repeat;
+        display: none;
+        transform: translate(-50%, -50%);
+        z-index: 2100;
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+      }
+      @media (max-width: 1000px) {
+        .magnifier-lens {
+          display: none;
+        }
+      }
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+      .lightbox.active {
+        display: flex;
+      }
+      .lightbox img {
+        max-width: 92%;
+        max-height: 92%;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .info h1 {
+        font-size: 2.2rem;
+        margin: 0 0 6px 0;
+        font-weight: 900;
+        color: #0b1220;
+      }
+      .price {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #f59e0b;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        margin-bottom: 8px;
+      }
+      .sizes {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .size-btn {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e6eef7;
+        background: white;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .qty {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn {
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        cursor: pointer;
+        font-weight: 800;
+        background: white;
+      }
+      .primary {
+        background: linear-gradient(90deg, #111827, #4f46e5);
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        border: none;
+      }
+      .muted {
+        background: var(--muted-plate);
+      }
+      .back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #111116;
+        text-decoration: none;
+        font-weight: 800;
+        background: linear-gradient(90deg, #f6e8b1, #d8b65a);
+        padding: 6px 10px;
+        border-radius: 8px;
+        box-shadow: 0 10px 26px rgba(216, 182, 90, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+
+      @media (max-width: 900px) {
+        .product-wrap {
+          grid-template-columns: 1fr;
+        }
+        .img-wrap {
+          height: 320px;
+        }
+      }
+    </style>
+    <script>
+      // Banner reset & accessibility (mirror index)
+      (function () {
+        const b = document.getElementById("ticker-banner");
+        if (!b) return;
+        const reduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+        if (reduced) {
+          b.style.animation = "none";
+          b.style.left = "8%";
+        }
+        b.addEventListener(
+          "mouseenter",
+          () => (b.style.animationPlayState = "paused")
+        );
+        b.addEventListener(
+          "mouseleave",
+          () => (b.style.animationPlayState = "running")
+        );
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Floating discount banner (continuous marquee, top) -->
+    <div id="discount-banner" aria-hidden="false">
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track" role="presentation">
+          <span class="m-item">Descuentos a partir de 3 artículos</span>
+        </div>
+      </div>
+    </div>
+    <style>
+      /* Continuous marquee - seamless loop by duplicating content */
+      #discount-banner {
+        position: fixed;
+        top: 18px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 3000;
+      }
+      .marquee {
+        pointer-events: auto;
+        overflow: hidden;
+        /* restrict width so only one chip is visible at a time */
+        width: min(92vw, 360px);
+        max-width: 360px;
+        border-radius: 999px;
+      }
+      .marquee-track {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        width: 100%;
+      }
+      .marquee-track .m-item {
+        display: inline-block;
+        padding: 10px 22px;
+        width: 340px;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(90deg, var(--brand-red), #b91c1c);
+        border-radius: 999px;
+        text-align: center;
+        animation: marquee-single 10s linear infinite;
+      }
+      .marquee:hover .marquee-track {
+        animation-play-state: paused;
+      }
+      @keyframes marquee-single {
+        /* Start off to the right, fade in quickly, stay centered, then fade out to left */
+        0% {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+        8% {
+          transform: translateX(30%);
+          opacity: 1;
+        }
+        18% {
+          transform: translateX(0%);
+          opacity: 1;
+        }
+        82% {
+          transform: translateX(0%);
+          opacity: 1;
+        }
+        92% {
+          transform: translateX(-30%);
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(-120%);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .marquee-track {
+          animation: none;
+        }
+        .marquee {
+          max-width: 92vw;
+        }
+      }
+    </style>
+    <style>
+      /* Local header tweaks: larger logo and centered nav */
+      .site-logo {
+        height: 64px;
+        width: auto;
+      }
+      .site-nav {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        align-items: center;
+      }
+    </style>
+    <header class="site-header">
+      <div class="header-left">
+        <div class="site-brand">
+          <div class="site-logo-wrapper">
+            <a href="../index.html" class="home-link" aria-label="Ir al inicio">
+              <img
+                src="../Images/Logo/Logo-transparent.png"
+                alt="FabricaMayorista"
+                class="site-logo"
+                onerror="this.onerror=null;this.src='../Images/Logo/Logo.png';"
+              />
+            </a>
+          </div>
+          <div class="brand-text">
+            <h1>FabricaMayorista</h1>
+            <p>
+              Precios al por mayor a partir de 3 artículos • Descuentos por
+              docena
+            </p>
+          </div>
+        </div>
+        <nav class="site-nav" aria-label="principal">
+          <a href="../crop-tops.html">Crop Tops</a>
+          <a href="../about.html">Sobre nosotros</a>
+          <a href="../contact.html">Contáctanos</a>
+          <a href="../ubicacion.html">Ubicación</a>
+        </nav>
+      </div>
+
+      <div class="header-actions">
+        <button id="theme-toggle" aria-label="Alternar tema" class="theme-btn">
+          🌗
+        </button>
+        <div class="search-wrapper" role="search">
+          <input type="search" id="site-search" placeholder="Buscar producto" />
+        </div>
+
+        <button class="header-cart-btn" onclick="toggleCart()">
+          🛒 Ver carrito
+          <span class="cart-badge-inline" id="cart-badge-header">0</span>
+        </button>
+      </div>
+    </header>
+
+    <button class="cart-icon-btn" onclick="toggleCart()">
+      🛒
+      <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+
+    <main class="container">
+      <div id="product" class="product-wrap">
+        <div class="img-wrap">
+          <img id="p-img" src="" alt="Producto" />
+          <button id="zoom-btn" class="img-zoom-btn" aria-label="Ver imagen">
+            🔍
+          </button>
+          <div class="img-zoom-hint">Lupa</div>
+        </div>
+        <div class="info">
+          <h1 id="p-name"></h1>
+          <div class="price" id="p-price">RD$450</div>
+          <div class="meta">Tallas disponibles:</div>
+          <div class="sizes" id="size-list"></div>
+          <div>
+            <label>Color (opciones):</label>
+            <div id="color-list" class="inline-row mt-10"></div>
+            <div id="selected-color" class="small-hint">
+              Color seleccionado:
+              <strong id="selected-color-name">Blanco</strong>
+            </div>
+            <div class="inline-row">
+              <input
+                id="custom-color-picker-detail"
+                type="color"
+                value="#ffffff"
+                class="small-color-picker"
+              />
+              <label for="custom-color-picker-detail" class="label-muted"
+                >Color personalizado</label
+              >
+            </div>
+          </div>
+          <div>
+            <label>Cantidad</label>
+            <div class="qty">
+              <button class="btn muted" id="q-dec">−</button>
+              <div id="q-val">1</div>
+              <button class="btn muted" id="q-inc">+</button>
+            </div>
+          </div>
+
+          <div class="inline-row mt-12">
+            <button class="btn primary" id="wa-btn">
+              📱 Pedir por WhatsApp
+            </button>
+            <button class="btn muted" id="add-cart">Añadir al carrito</button>
+          </div>
+
+          <div class="small-hint">
+            Precios: Detalle RD$450 • Mayor (3+) RD$350 • Docena (12+) RD$300
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Datos locales para Crop Tops
+      function pad(n) {
+        return String(n).padStart(3, "0");
+      }
+      const basePrice = { retail: 450, wholesale: 350, dozen: 300 };
+      const products = [];
+      for (let i = 9; i <= 25; i++) {
+        const id = pad(i);
+        products.push({
+          id,
+          name: `Crop Top ${id}`,
+          image: `../Images/${id}/${id}.jpg`,
+          sizes: ["S", "M", "L", "XL", "2XL", "3XL"],
+        });
+      }
+
+      const params = new URLSearchParams(location.search);
+      const pid = params.get("pid") || "009";
+      const prod = products.find((p) => p.id === pid) || products[0];
+
+      // Estado
+      let qty = 1;
+      let selectedSize = prod.sizes[1] || "M";
+      // intentar leer color o colorHex desde query param para preseleccionar
+      const urlParams = new URLSearchParams(location.search);
+      let selectedColor = urlParams.get("color") || "Blanco";
+      let selectedColorHex = urlParams.get("colorHex") || null;
+
+      document.getElementById("p-name").textContent = prod.name;
+      const img = document.getElementById("p-img");
+      img.src = prod.image;
+      img.onerror = () => {
+        img.src = "../Images/001/001 blanco.jpg";
+      };
+
+      function calculatePrice(qty) {
+        if (qty >= 12) return basePrice.dozen;
+        if (qty >= 3) return basePrice.wholesale;
+        return basePrice.retail;
+      }
+
+      function renderPrice() {
+        document.getElementById("p-price").textContent = `RD$${calculatePrice(
+          qty
+        )}`;
+      }
+      renderPrice();
+
+      // Lightbox (lupa) behaviour
+      const zoomBtn = document.getElementById("zoom-btn");
+      const lightbox = document.createElement("div");
+      lightbox.className = "lightbox";
+      const lbImg = document.createElement("img");
+      lightbox.appendChild(lbImg);
+      document.body.appendChild(lightbox);
+      zoomBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        lbImg.src = img.src;
+        lightbox.classList.add("active");
+      });
+      img.addEventListener("click", () => {
+        lbImg.src = img.src;
+        lightbox.classList.add("active");
+      });
+      lightbox.addEventListener("click", () =>
+        lightbox.classList.remove("active")
+      );
+      window.addEventListener("keydown", (ev) => {
+        if (ev.key === "Escape") lightbox.classList.remove("active");
+      });
+
+      // sizes
+      const sizeList = document.getElementById("size-list");
+      prod.sizes.forEach((s) => {
+        const b = document.createElement("button");
+        b.className = "size-btn";
+        b.textContent = s;
+        if (s === selectedSize) b.classList.add("size-selected");
+        else b.classList.add("size-default");
+        b.addEventListener("click", () => {
+          selectedSize = s;
+          Array.from(sizeList.children).forEach((c) =>
+            c.classList.remove("size-selected")
+          );
+          b.classList.add("size-selected");
+        });
+        sizeList.appendChild(b);
+      });
+
+      // colors (paleta visual - swatches interactivos)
+      const palette = [
+        { name: "Blanco", hex: "#ffffff" },
+        { name: "Negro", hex: "#111113" },
+        { name: "Azul", hex: "#1e90ff" },
+        { name: "Verde", hex: "#2ecc71" },
+        { name: "Rojo Vino", hex: "#7b1f2b" },
+        { name: "Marrón", hex: "#8b5e3c" },
+      ];
+      const colorList = document.getElementById("color-list");
+      const selectedColorName = document.getElementById("selected-color-name");
+      palette.forEach((c, idx) => {
+        const el = document.createElement("button");
+        el.className = "size-btn";
+        el.style.padding = "8px";
+        el.style.borderRadius = "999px";
+        el.style.minWidth = "44px";
+        el.style.height = "44px";
+        el.style.border = "2px solid #eef2ff";
+        el.style.background = c.hex;
+        el.title = c.name;
+        el.addEventListener("click", () => {
+          selectedColor = c.name;
+          selectedColorHex = null;
+          Array.from(colorList.children).forEach(
+            (x) => (x.style.boxShadow = "")
+          );
+          el.style.boxShadow = "0 8px 26px rgba(15,23,42,0.12)";
+          selectedColorName.textContent = c.name;
+        });
+        // si el query param colorHex coincide con este swatch, marcarlo
+        if (
+          selectedColorHex &&
+          selectedColorHex.toLowerCase() === c.hex.toLowerCase()
+        ) {
+          el.style.boxShadow = "0 8px 26px rgba(15,23,42,0.12)";
+          selectedColor = c.name;
+          selectedColorName.textContent = c.name;
+        } else if (c.name === selectedColor) {
+          el.style.boxShadow = "0 8px 26px rgba(15,23,42,0.12)";
+          selectedColorName.textContent = c.name;
+        }
+        colorList.appendChild(el);
+      });
+
+      // manejar el picker de color personalizado en la página de detalle
+      const customPicker = document.getElementById(
+        "custom-color-picker-detail"
+      );
+      if (customPicker) {
+        // si viene colorHex en la URL, prellenar
+        if (selectedColorHex) {
+          customPicker.value = selectedColorHex;
+          selectedColorName.textContent = selectedColorHex;
+        }
+        customPicker.addEventListener("change", (e) => {
+          selectedColorHex = e.target.value;
+          selectedColor = "Personalizado";
+          // limpiar sombras y marcar que viene un HEX personalizado
+          Array.from(colorList.children).forEach(
+            (x) => (x.style.boxShadow = "")
+          );
+          selectedColorName.textContent = selectedColorHex;
+          // también cambiar el color del botón WA para dar feedback visual (opcional)
+          const waBtn = document.getElementById("wa-btn");
+          if (waBtn) waBtn.style.boxShadow = `0 8px 30px ${selectedColorHex}33`;
+        });
+      }
+
+      document.getElementById("q-inc").addEventListener("click", () => {
+        qty++;
+        document.getElementById("q-val").textContent = qty;
+        renderPrice();
+      });
+      document.getElementById("q-dec").addEventListener("click", () => {
+        if (qty > 1) qty--;
+        document.getElementById("q-val").textContent = qty;
+        renderPrice();
+      });
+
+      document.getElementById("wa-btn").addEventListener("click", () => {
+        const unit = calculatePrice(qty);
+        let msg = `*Pedido FabricaMayorista*\n${
+          prod.name
+        }\nCantidad: ${qty} x RD$${unit.toFixed(
+          2
+        )}\nTalla: ${selectedSize}\nColor: ${selectedColor}\n\nTotal: RD$${(
+          unit * qty
+        ).toFixed(2)}`;
+        const wa = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        window.open(wa, "_blank");
+      });
+
+      // agregar al carrito simple: usa localStorage 'fm_cart_v1' en mismo formato que app.js
+      document.getElementById("add-cart").addEventListener("click", () => {
+        const raw = localStorage.getItem("fm_cart_v1");
+        let cart = [];
+        try {
+          cart = raw ? JSON.parse(raw) : [];
+        } catch (e) {}
+        const existing = cart.find(
+          (i) =>
+            i.id === prod.id &&
+            i.size === selectedSize &&
+            i.colorDisplay === selectedColor
+        );
+        if (existing) existing.qty += qty;
+        else
+          cart.push({
+            id: prod.id,
+            name: prod.name,
+            basePrice: basePrice,
+            colorDisplay: selectedColor,
+            colorHex: selectedColorHex || null,
+            size: selectedSize,
+            qty: qty,
+            image: prod.image,
+            imageOriginal: prod.image,
+          });
+        localStorage.setItem("fm_cart_v1", JSON.stringify(cart));
+        alert("Añadido al carrito");
+      });
+
+      // Magnifier lens: desktop-only, follows cursor and shows zoomed area
+      (function () {
+        const imgWrap = document.querySelector(".img-wrap");
+        const imgEl = document.getElementById("p-img");
+        if (!imgWrap || !imgEl) return;
+        if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+
+        const lens = document.createElement("div");
+        lens.className = "magnifier-lens";
+        imgWrap.appendChild(lens);
+
+        const zoomFactor = 2.0; // x2 zoom — menos pixelado
+
+        function moveLens(e) {
+          const rect = imgEl.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          // limit x,y to image bounds
+          const cx = Math.max(0, Math.min(x, rect.width));
+          const cy = Math.max(0, Math.min(y, rect.height));
+
+          const bgW = rect.width * zoomFactor;
+          const bgH = rect.height * zoomFactor;
+          const bgX = (cx / rect.width) * 100;
+          const bgY = (cy / rect.height) * 100;
+
+          lens.style.backgroundImage = `url('${imgEl.src}')`;
+          lens.style.backgroundSize = `${bgW}px ${bgH}px`;
+          lens.style.backgroundPosition = `${bgX}% ${bgY}%`;
+
+          // position lens centered on cursor within imgWrap
+          const wrapRect = imgWrap.getBoundingClientRect();
+          const left = e.clientX - wrapRect.left;
+          const top = e.clientY - wrapRect.top;
+          lens.style.left = `${left}px`;
+          lens.style.top = `${top}px`;
+          lens.style.display = "block";
+        }
+
+        imgWrap.addEventListener("mousemove", moveLens);
+        imgWrap.addEventListener("mouseenter", moveLens);
+        imgWrap.addEventListener("mouseleave", () => {
+          lens.style.display = "none";
+        });
+      })();
+    </script>
+  </body>
+</html>

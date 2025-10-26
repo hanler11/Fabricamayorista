@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contáctanos - FabricaMayorista</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- HEADER -->
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="brand" aria-label="Inicio">
+          <div class="logo">
+            <img
+              src="Images/Logo/logo.png"
+              alt="FabricaMayorista Logo"
+              class="logo-img"
+            />
+          </div>
+          <div class="brand-text">
+            <h1>FabricaMayorista</h1>
+            <p>
+              Precios al por mayor a partir de 3 artículos • Descuentos por
+              docena
+            </p>
+          </div>
+        </a>
+
+        <nav class="header-nav" aria-label="principal">
+          <a href="index.html" class="nav-link">Inicio</a>
+          <a href="about.html" class="nav-link">Sobre nosotros</a>
+          <a href="contact.html" class="nav-link active">Contáctanos</a>
+          <a href="ubicacion.html" class="nav-link">Ubicación</a>
+        </nav>
+        <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input id="site-search" type="search" placeholder="Buscar producto" />
+        </div>
+
+        <div class="header-actions">
+          <button
+            class="cart-btn cart-btn-white"
+            id="cart-open"
+            aria-label="Abrir carrito"
+          >
+            🛒 Carrito
+            <span id="cart-badge-header" class="cart-badge cart-badge-black">0</span>
+          </button>
+          <!-- Hamburger toggle (visible on mobile) -->
+          <button class="header-toggle" id="nav-toggle" aria-label="Abrir menú">☰</button>
+        </div>
+      </div>
+    </header>
+    <!-- Redes en header (visible en responsive) -->
+    <div class="header-social-row" aria-label="Redes sociales">
+      <a
+        href="https://wa.me/18093027761"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab whatsapp"
+        title="WhatsApp"
+      >
+        <img
+          src="Images/whatsapp/whatsapp.png"
+          alt="WhatsApp"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.facebook.com/profile.php?id=100081172579797"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab facebook"
+        title="Facebook"
+      >
+        <img
+          src="Images/facebook/facebook.png"
+          alt="Facebook"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.instagram.com/fabricamayoristamoda?utm_source=ig_web_button_share_sheet&igsh=c3F4czk4NWtsaW50"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab instagram"
+        title="Instagram"
+      >
+        <img
+          src="Images/instagram/instagram.png"
+          alt="Instagram"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.threads.com/@fabricamayoristamoda?xmt=AQF0OBZR_7gmCn2_4GTbrKAB40gEL7kEJnkEQeFrG16Bcgw"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab threads"
+        title="Threads"
+      >
+        <img
+          src="Images/threads/threads.png"
+          alt="Threads"
+          class="social-icon"
+        />
+      </a>
+    </div>
+
+    <!-- SUB-NAV SECCIONES -->
+    <nav class="section-tabs" aria-label="Secciones">
+      <button class="tab-button" onclick="window.location.href='blusas.html'">
+        Blusas
+      </button>
+      <button
+        class="tab-button"
+        onclick="window.location.href='crop-tops.html'"
+      >
+        Crop Tops
+      </button>
+      <button class="tab-button" onclick="window.location.href='vestidos.html'">
+        Vestidos
+      </button>
+      <button class="tab-button" onclick="window.location.href='faldas.html'">
+        Faldas
+      </button>
+      <button
+        class="tab-button"
+        onclick="window.location.href='pantalones.html'"
+      >
+        Pantalones
+      </button>
+      <button
+        class="tab-button"
+        onclick="window.location.href='conjuntos.html'"
+      >
+        Conjuntos
+      </button>
+      <button
+        class="tab-button"
+        onclick="window.location.href='enterizos.html'"
+      >
+        Enterizos
+      </button>
+      <button class="tab-button" onclick="window.location.href='body.html'">
+        Body
+      </button>
+      <button class="tab-button" onclick="window.location.href='danza.html'">
+        Danza
+      </button>
+      <button
+        class="tab-button active"
+        onclick="window.location.href='index.html#covers'"
+      >
+        Más categorías
+      </button>
+    </nav>
+
+    <!-- Social Media FAB Buttons -->
+    <div class="social-fab-container">
+      <a
+        href="https://wa.me/18093027761"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab whatsapp"
+        title="WhatsApp"
+      >
+        <img
+          src="Images/whatsapp/whatsapp.png"
+          alt="WhatsApp"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.facebook.com/profile.php?id=100081172579797"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab facebook"
+        title="Facebook"
+      >
+        <img
+          src="Images/facebook/facebook.png"
+          alt="Facebook"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.instagram.com/fabricamayoristamoda?utm_source=ig_web_button_share_sheet&igsh=c3F4czk4NWtsaW50"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab instagram"
+        title="Instagram"
+      >
+        <img
+          src="Images/instagram/instagram.png"
+          alt="Instagram"
+          class="social-icon"
+        />
+      </a>
+      <a
+        href="https://www.threads.com/@fabricamayoristamoda?xmt=AQF0OBZR_7gmCn2_4GTbrKAB40gEL7kEJnkEQeFrG16Bcgw"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-fab threads"
+        title="Threads"
+      >
+        <img
+          src="Images/threads/threads.png"
+          alt="Threads"
+          class="social-icon"
+        />
+      </a>
+    </div>
+
+    <!-- Small floating cart button for mobile -->
+    <button class="fab-cart fab-cart-white" id="fab-cart">
+      🛒
+      <span id="cart-badge" class="cart-badge cart-badge-black">0</span>
+    </button>
+
+    <main class="container">
+      <!-- PAGE HERO -->
+      <div class="page-hero-simple">
+        <div class="hero-content">
+          <h1 class="hero-title">Contáctanos</h1>
+          <p class="hero-subtitle">
+            ¿Tienes alguna pregunta? Estamos aquí para ayudarte
+          </p>
+          <div class="hero-breadcrumb">
+            <a href="index.html">Inicio</a> / <span>Contacto</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT INFO CARDS -->
+      <div class="contact-info-grid">
+        <div class="contact-info-card">
+          <div class="contact-icon">📱</div>
+          <h3>WhatsApp</h3>
+          <p>Respuesta inmediata</p>
+          <a href="https://wa.me/18093027761" class="contact-link"
+            >Enviar mensaje</a
+          >
+        </div>
+
+        <div class="contact-info-card">
+          <div class="contact-icon">📧</div>
+          <h3>Email</h3>
+          <p>Respuesta en 24 horas</p>
+          <a href="mailto:Fabricamayoristamoda@gmail.com" class="contact-link"
+            >Fabricamayoristamoda@gmail.com</a
+          >
+        </div>
+
+        <div class="contact-info-card">
+          <div class="contact-icon">📍</div>
+          <h3>Ubicación</h3>
+          <p>Visítanos en nuestra tienda</p>
+          <a href="ubicacion.html" class="contact-link">Ver ubicación y mapa</a>
+        </div>
+      </div>
+
+      <!-- CONTACT FORM SECTION -->
+      <section id="contact-section" class="contact-section">
+        <div class="contact-card">
+          <h2>Envíanos un mensaje</h2>
+          <p>
+            Déjanos tus datos y te contactaremos por WhatsApp lo más pronto
+            posible.
+          </p>
+          <form id="contact-form">
+            <div class="form-row">
+              <input
+                type="text"
+                id="contact-first"
+                placeholder="Nombre"
+                required
+              />
+              <input
+                type="text"
+                id="contact-last"
+                placeholder="Apellido"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <input
+                type="email"
+                id="contact-email"
+                placeholder="Correo electrónico"
+                required
+              />
+              <input
+                type="tel"
+                id="contact-phone"
+                placeholder="Teléfono"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <select
+                id="contact-reason"
+                title="Selecciona la razón de contacto"
+                required
+              >
+                <option value="">Selecciona una razón de contacto</option>
+                <option value="Consulta de precios">
+                  💰 Consulta de precios
+                </option>
+                <option value="Pedido al por mayor">
+                  📦 Pedido al por mayor
+                </option>
+                <option value="Información general">
+                  ℹ️ Información general
+                </option>
+                <option value="Sugerencias">💡 Sugerencias</option>
+                <option value="Otros">❓ Otros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <textarea
+                id="contact-note"
+                rows="4"
+                placeholder="Cuéntanos cómo podemos ayudarte..."
+                required
+              ></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">
+                Enviar por WhatsApp
+              </button>
+              <button type="button" id="contact-reset" class="btn-secondary">
+                Limpiar formulario
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- FAQ SECTION -->
+      <section class="faq-section">
+        <h2 class="section-title">Preguntas Frecuentes</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3>¿Cuál es el mínimo para precios mayoristas?</h3>
+            <p>
+              A partir de 3 artículos obtienes precios mayoristas. A partir de
+              12 artículos obtienes precios por docena.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Hacen envíos a toda República Dominicana?</h3>
+            <p>
+              Sí, realizamos envíos a todo el país. Los costos de envío varían
+              según la ubicación.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cuáles son las formas de pago?</h3>
+            <p>
+              Aceptamos transferencias bancarias, pagos móviles y efectivo
+              contra entrega.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Tienen tienda física?</h3>
+            <p>
+              Sí, contamos con showroom donde puedes ver y tocar los productos
+              antes de comprar.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Back to Home -->
+      <div class="back-to-home">
+        <a href="index.html" class="btn btn-secondary"> ← Volver al inicio </a>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <a href="index.html" aria-label="Inicio">
+              <img src="Images/Logo/logo.png" alt="FabricaMayorista" />
+            </a>
+            <p>Fábrica con precios al por mayor.</p>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Secciones</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="about.html">Sobre nosotros</a></li>
+            <li><a href="body.html">Body</a></li>
+            <li><a href="crop-tops.html">Crop Tops</a></li>
+            <li><a href="blusas.html">Blusas</a></li>
+            <li><a href="vestidos.html">Vestidos</a></li>
+            <li><a href="faldas.html">Faldas</a></li>
+            <li><a href="pantalones.html">Pantalones</a></li>
+            <li><a href="conjuntos.html">Conjuntos</a></li>
+            <li><a href="enterizos.html">Enterizos</a></li>
+            <li><a href="danza.html">Danza</a></li>
+            <li><a href="contact.html">Contáctanos</a></li>
+            <li><a href="ubicacion.html">Ubicación</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Redes sociales</h4>
+          <div class="footer-social">
+            <a
+              href="https://wa.me/18093027761"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-fab whatsapp"
+              aria-label="WhatsApp"
+              ><img
+                src="Images/whatsapp/whatsapp.png"
+                alt="WhatsApp"
+                class="social-icon-small"
+            /></a>
+            <a
+              href="https://www.facebook.com/profile.php?id=100081172579797"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-fab facebook"
+              aria-label="Facebook"
+              ><img
+                src="Images/facebook/facebook.png"
+                alt="Facebook"
+                class="social-icon-small"
+            /></a>
+            <a
+              href="https://www.instagram.com/fabricamayoristamoda?utm_source=ig_web_button_share_sheet&igsh=c3F4czk4NWtsaW50"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-fab instagram"
+              aria-label="Instagram"
+              ><img
+                src="Images/instagram/instagram.png"
+                alt="Instagram"
+                class="social-icon-small"
+            /></a>
+            <a
+              href="https://www.threads.com/@fabricamayoristamoda?xmt=AQF0OBZR_7gmCn2_4GTbrKAB40gEL7kEJnkEQeFrG16Bcgw"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-fab threads"
+              aria-label="Threads"
+              ><img
+                src="Images/threads/threads.png"
+                alt="Threads"
+                class="social-icon-small"
+            /></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">
+        © <span id="y"></span> FabricaMayorista. Todos los derechos reservados.
+      </div>
+      <script>
+        document.getElementById("y").textContent = new Date().getFullYear();
+      </script>
+    </footer>
+
+    <!-- Contact specific script -->
+    <script src="app.js"></script>
+    <script>
+      (function () {
+        const toggle = document.getElementById("nav-toggle");
+        const overlay = document.getElementById("nav-overlay");
+        function openNav() {
+          document.body.classList.add("nav-open");
+        }
+        function closeNav() {
+          document.body.classList.remove("nav-open");
+        }
+        if (toggle) {
+          toggle.addEventListener("click", () => {
+            const isOpen = document.body.classList.contains("nav-open");
+            if (isOpen) closeNav();
+            else openNav();
+          });
+        }
+        if (overlay) overlay.addEventListener("click", closeNav);
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeNav();
+        });
+      })();
+    </script>
+    <script>
+      // Contact form functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        const contactForm = document.getElementById("contact-form");
+        const resetBtn = document.getElementById("contact-reset");
+
+        if (contactForm) {
+          contactForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const firstName = document.getElementById("contact-first").value;
+            const lastName = document.getElementById("contact-last").value;
+            const email = document.getElementById("contact-email").value;
+            const phone = document.getElementById("contact-phone").value;
+            const reason = document.getElementById("contact-reason").value;
+            const message = document.getElementById("contact-note").value;
+
+            const fullName = `${firstName} ${lastName}`.trim();
+            const whatsappMessage =
+              `*Nuevo contacto desde FabricaMayorista*\n\n` +
+              `*Nombre:* ${fullName}\n` +
+              `*Email:* ${email}\n` +
+              `*Teléfono:* ${phone}\n` +
+              `*Motivo:* ${reason}\n\n` +
+              `*Mensaje:*\n${message}\n\n` +
+              `Enviado desde la página de contacto`;
+
+            const whatsappUrl = `https://wa.me/18093027761?text=${encodeURIComponent(
+              whatsappMessage
+            )}`;
+
+            try {
+              window.open(whatsappUrl, "_blank");
+            } catch (error) {
+              console.error("Error opening WhatsApp:", error);
+              alert("Error al abrir WhatsApp. Por favor, inténtalo de nuevo.");
+            }
+          });
+        }
+
+        if (resetBtn) {
+          resetBtn.addEventListener("click", () => {
+            contactForm.reset();
+          });
+        }
+      });
+    </script>
+    <script src="hamburger-menu.js"></script>
+  </body>
+</html>

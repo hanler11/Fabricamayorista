@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug - Tallas Múltiples</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        background: #f5f5f5;
+      }
+      .debug-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .status-box {
+        background: #e8f4fd;
+        border: 1px solid #b3d9f7;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .test-steps {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .test-steps h3 {
+        color: #495057;
+        margin-bottom: 15px;
+      }
+      .test-steps ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .test-steps li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .error-fix {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+      .error-fix h4 {
+        color: #856404;
+        margin-bottom: 10px;
+      }
+      .console-tip {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🐛 Debug - Tallas Múltiples</h1>
+
+      <div class="status-box">
+        <strong>✅ Problemas corregidos:</strong><br />
+        • Validación mejorada para tallas múltiples<br />
+        • Cálculo de precios con recargo XL+ (+RD$50)<br />
+        • Items del carrito separados por talla<br />
+        • Logging en consola para debug
+      </div>
+
+      <div class="console-tip">
+        <strong>💡 Consola de Debug:</strong><br />
+        Abre las herramientas de desarrollo (F12) y ve a la pestaña "Console"
+        para ver los logs de debug mientras pruebas.
+      </div>
+
+      <div class="test-steps">
+        <h3>🧪 Pasos para probar:</h3>
+        <ol>
+          <li>Abre las herramientas de desarrollo (F12) → Console</li>
+          <li>Haz clic en "Probar Página Principal" o "Probar Crop Tops"</li>
+          <li>Abre cualquier producto (haz clic en una imagen)</li>
+          <li>Cambia la cantidad a 2 o más</li>
+          <li>Selecciona tallas diferentes para cada artículo</li>
+          <li>Observa los logs en la consola</li>
+          <li>Agrega al carrito y verifica que aparecen las tallas</li>
+          <li>Prueba con tallas XL, 2XL, 3XL para verificar el recargo</li>
+        </ol>
+      </div>
+
+      <button class="test-button" onclick="window.open('index.html', '_blank')">
+        🏠 Probar Página Principal
+      </button>
+
+      <button
+        class="test-button"
+        onclick="window.open('crop-tops.html', '_blank')"
+      >
+        👕 Probar Crop Tops
+      </button>
+
+      <div class="error-fix">
+        <h4>🔧 Qué verificar:</h4>
+        <ul>
+          <li>
+            <strong>Validación:</strong> No debe pedir tallas si ya están
+            seleccionadas
+          </li>
+          <li><strong>Precios:</strong> XL/2XL/3XL deben tener +RD$50</li>
+          <li>
+            <strong>Carrito:</strong> Debe mostrar items separados con sus
+            tallas
+          </li>
+          <li>
+            <strong>Console:</strong> Debe mostrar logs de selección y
+            validación
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-steps">
+        <h3>📊 Ejemplo de prueba:</h3>
+        <ol>
+          <li><strong>Selecciona cantidad 3</strong></li>
+          <li>
+            <strong>Elige tallas:</strong> Artículo 1: S, Artículo 2: XL,
+            Artículo 3: 2XL
+          </li>
+          <li>
+            <strong>Resultado esperado:</strong>
+            <ul>
+              <li>3 items en el carrito</li>
+              <li>Precio S: normal</li>
+              <li>Precio XL: +RD$50</li>
+              <li>Precio 2XL: +RD$50</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <script>
+      console.log("🐛 Debug preparado - Verifica los logs mientras pruebas");
+      console.log("Problemas corregidos:");
+      console.log("✅ Validación de tallas múltiples");
+      console.log("✅ Cálculo de precios con recargo XL+");
+      console.log("✅ Reset de variables al abrir modal");
+      console.log("✅ Logging para debug");
+    </script>
+  </body>
+</html>

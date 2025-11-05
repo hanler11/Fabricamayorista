@@ -1199,6 +1199,45 @@ function closeModal() {
     modalKeydownAttached = false;
   }
   currentIndexInVisible = -1;
+
+  // Reset global de selección para prevenir persistencia entre aperturas
+  try {
+    if (typeof selectedSizes !== "undefined") selectedSizes = [];
+    if (typeof selectedColors !== "undefined") selectedColors = [];
+    if (typeof selectedSize !== "undefined") selectedSize = null;
+    if (typeof selectedColor !== "undefined") selectedColor = "default";
+    if (typeof selectedColorHex !== "undefined") selectedColorHex = "#e0e0e0";
+    if (typeof isCustomColor !== "undefined") isCustomColor = false;
+    if (typeof quantity !== "undefined") quantity = 1;
+    __autoAddAfterValidation = false;
+    __lastIntent = null;
+
+    const sizeContainer = document.getElementById("size-options");
+    if (
+      sizeContainer &&
+      currentProduct &&
+      Array.isArray(currentProduct.sizes)
+    ) {
+      sizeContainer.innerHTML = "";
+      sizeContainer.className = "size-options-zara";
+      currentProduct.sizes.forEach((sz) => {
+        const b = document.createElement("button");
+        b.className = "size-btn";
+        b.type = "button";
+        b.textContent = sz;
+        b.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectSize(sz);
+        });
+        sizeContainer.appendChild(b);
+      });
+    }
+    document
+      .querySelectorAll(".swatch, .swatch-small, .swatch-original")
+      .forEach((s) => s.classList.remove("active"));
+  } catch (e) {
+    console.warn("closeModal reset error (blusas):", e);
+  }
 }
 
 // Inicializar página

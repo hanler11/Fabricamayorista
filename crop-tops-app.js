@@ -1,7 +1,100 @@
 // crop-tops-app.js — JavaScript específico para la página de Crop Tops
 
-// Importar productos del archivo principal
+// Generar productos crop tops 009..048
+// Local products array específico para esta página (restaurado).
+// Esto evita depender de la variable global `window.products` y restaura
+// el comportamiento previo donde la sección Crop Tops sembraba sus propios productos.
 const products = [];
+
+function pad(n) {
+  return String(n).padStart(3, "0");
+}
+
+// Generar productos crop tops 009..048
+for (let i = 9; i <= 48; i++) {
+  const id = pad(i);
+  const images = { default: `Images/${id}/${id}.jpg` };
+  products.push({
+    id,
+    name: `Crop Top ${id}`,
+    code: `FM-00${id}`,
+    price: { retail: 450, dozen: 375 },
+    images,
+    sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  });
+}
+
+// Aplicar precios específicos para crop tops
+function applyCropTopPrices() {
+  const cropTopPrices = {
+    "009": { retail: 250, wholesale: 250, dozen: 200 },
+    "010": { retail: 250, wholesale: 250, dozen: 200 },
+    "011": { retail: 150, wholesale: 150, dozen: 150 },
+    "012": { retail: 200, wholesale: 200, dozen: 150 },
+    "013": { retail: 200, wholesale: 200, dozen: 150 },
+    "014": { retail: 300, wholesale: 300, dozen: 250 },
+    "015": { retail: 300, wholesale: 300, dozen: 250 },
+    "016": { retail: 250, wholesale: 250, dozen: 200 },
+    "017": { retail: 250, wholesale: 250, dozen: 200 },
+    "018": { retail: 150, wholesale: 150, dozen: 100 },
+    "019": { retail: 150, wholesale: 150, dozen: 100 },
+    "020": { retail: 150, wholesale: 150, dozen: 100 },
+    "021": { retail: 150, wholesale: 150, dozen: 100 },
+    "022": { retail: 200, wholesale: 200, dozen: 150 },
+    "023": { retail: 350, wholesale: 350, dozen: 250 },
+    "024": { retail: 150, wholesale: 150, dozen: 100 },
+    "025": { retail: 350, wholesale: 350, dozen: 300 },
+    "026": { retail: 225, wholesale: 225, dozen: 150 },
+    "027": { retail: 350, wholesale: 350, dozen: 250 },
+    "028": { retail: 200, wholesale: 200, dozen: 150 },
+    "029": { retail: 350, wholesale: 350, dozen: 300 },
+    "030": { retail: 300, wholesale: 300, dozen: 250 },
+    "031": { retail: 350, wholesale: 350, dozen: 300 },
+    "032": { retail: 350, wholesale: 350, dozen: 300 },
+    "033": { retail: 225, wholesale: 225, dozen: 200 },
+    "034": { retail: 250, wholesale: 250, dozen: 200 },
+    "035": { retail: 150, wholesale: 150, dozen: 100 },
+    "036": { retail: 300, wholesale: 300, dozen: 250 },
+    "037": { retail: 250, wholesale: 250, dozen: 200 },
+    "038": { retail: 250, wholesale: 250, dozen: 200 },
+    "039": { retail: 150, wholesale: 150, dozen: 100 },
+    "040": { retail: 150, wholesale: 150, dozen: 100 },
+    "041": { retail: 150, wholesale: 150, dozen: 100 },
+    "042": { retail: 150, wholesale: 150, dozen: 100 },
+    "043": { retail: 175, wholesale: 175, dozen: 125 },
+    "044": { retail: 250, wholesale: 250, dozen: 200 },
+    "045": { retail: 150, wholesale: 150, dozen: 100 },
+    "046": { retail: 250, wholesale: 250, dozen: 200 },
+    "047": { retail: 250, wholesale: 250, dozen: 200 },
+    "048": { retail: 175, wholesale: 175, dozen: 150 },
+  };
+
+  Object.entries(cropTopPrices).forEach(([productId, prices]) => {
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      product.price = prices;
+    }
+  });
+}
+
+// Aplicar precios específicos
+applyCropTopPrices();
+
+// Unificar precios: usar 2 niveles (unidad y mayor 3+ = docena)
+products.forEach((p) => {
+  if (p && p.price) {
+    const dozen =
+      p.price.dozen !== undefined ? Number(p.price.dozen) : undefined;
+    if (dozen !== undefined && !Number.isNaN(dozen)) {
+      p.price.wholesale = dozen; // Mayor (3+) igual a docena
+    }
+  }
+});
+
+// Debug: verificar que los productos se crearon
+console.log("Crop tops products loaded:", products.length);
+console.log("First product:", products[0]);
+console.log("Last product:", products[products.length - 1]);
 
 // Nombre amigable por categoría (evita mostrar "Artículo N")
 function getDisplayNameSection(p) {
@@ -376,6 +469,8 @@ let selectedColor = "default";
 let selectedColorHex = "#e0e0e0";
 let isCustomColor = false;
 let selectedSize = null;
+let selectedSizes = []; // Array para múltiples tallas
+let selectedColors = []; // Colores por artículo cuando quantity>1
 let quantity = 1;
 let searchQuery = "";
 // Navegación en modal (sección Crop Tops)
@@ -422,6 +517,7 @@ const colorNames = {
   "amarillo-dorado": "Amarillo Dorado",
   "rosado claro": "Rosado Claro",
   naranja: "Naranja",
+  original: "Original (como en la foto)",
 };
 
 // Emoji por color (usa la clave de color, no el color hex personalizado)
@@ -470,8 +566,12 @@ function calculatePrice(qty, basePrice, size = null) {
 
 // Función para renderizar solo los crop tops (IDs 009..025)
 function renderCropTops() {
+  console.log("renderCropTops called, products length:", products.length);
   const container = document.getElementById("crop-tops-products");
-  if (!container) return;
+  if (!container) {
+    console.error("Container crop-tops-products not found!");
+    return;
+  }
 
   container.innerHTML = "";
   function normalizeText(str) {
@@ -497,7 +597,9 @@ function renderCropTops() {
     return isCropTop && normalizeText(searchText).includes(q);
   });
 
+  console.log("Filtered crop tops:", cropTops.length);
   if (cropTops.length === 0) {
+    console.log("No crop tops found, showing empty state");
     container.innerHTML =
       '<div class="empty-state">No se encontraron crop tops</div>';
     return;
@@ -620,35 +722,10 @@ function openModal(id) {
   const codeEl = document.getElementById("modal-code-display");
 
   // Título y código del producto
-  // Título y código: sólo nombre del artículo y código separado
-  if (nameEl) nameEl.textContent = "Crop Top";
-  if (codeEl) codeEl.textContent = `${currentProduct.code}`;
+  if (nameEl) nameEl.textContent = currentProduct.name;
+  if (codeEl) codeEl.textContent = currentProduct.code;
 
-  // Mostrar badge de descuento si aplica
-  const discountBadge = document.getElementById("discount-badge");
-  const retailPrice = currentProduct.price.retail;
-  const dozenPrice = currentProduct.price.dozen;
-  const savings = retailPrice - dozenPrice;
-  const discountPercent = Math.round((savings / retailPrice) * 100);
-
-  if (discountBadge && discountPercent > 0) {
-    discountBadge.textContent = `-${discountPercent}%`;
-    discountBadge.style.display = "block";
-  }
-
-  // Actualizar tabla de precios profesional (dos niveles: unidad y mayor 3+)
-  const retailEl = document.getElementById("price-retail");
-  const wholesaleEl = document.getElementById("price-wholesale");
-  const dozenEl = document.getElementById("price-dozen");
-
-  // Detectar si el precio es único (retail = docena)
-  const mayorPrice =
-    (currentProduct.price && currentProduct.price.dozen) ||
-    (currentProduct.price && currentProduct.price.wholesale) ||
-    (currentProduct.price && currentProduct.price.retail) ||
-    0;
-
-  // Mostrar ambas filas siempre
+  // Actualizar tabla de precios - usar la estructura idéntica a blusas
   const pricingContainer = document.querySelector(".pricing-tiers-zara");
   if (pricingContainer) {
     pricingContainer.innerHTML = `
@@ -658,8 +735,8 @@ function openModal(id) {
         <span id="price-retail" class="tier-price">RD$${currentProduct.price.retail}</span>
       </div>
       <div class="tier-row">
-        <span class="qty-text">Precio al por mayor (3+)</span>
-        <span id="price-dozen" class="tier-price">RD$${mayorPrice}</span>
+        <span class="qty-text">Precio por docena</span>
+        <span id="price-dozen" class="tier-price">RD$${currentProduct.price.dozen}</span>
       </div>
     `;
   }
@@ -787,7 +864,7 @@ function navigateModal(delta) {
         <span id="price-retail" class="tier-price">RD$${retail}</span>
       </div>
       <div class="tier-row">
-        <span class="qty-text">Precio al por mayor (3+)</span>
+        <span class="qty-text">12 de docena (3+)</span>
         <span id="price-dozen" class="tier-price">RD$${mayor}</span>
       </div>
     `;
@@ -825,39 +902,44 @@ function setupModalControls() {
   const modal = document.getElementById("product-modal");
   if (!modal) return;
 
-  // Color swatches
+  // Color swatches - usar la clase correcta para el nuevo modal
   const swatchesContainer = document.getElementById("color-swatches");
   const colorGroup = swatchesContainer
     ? swatchesContainer.closest(".selection-group-zara")
     : null;
   const customColorPicker = document.getElementById("custom-color-picker");
-  const productHasColorOptions = Boolean(
-    (currentProduct && Array.isArray(currentProduct.colors) && currentProduct.colors.length > 0) ||
-      (currentProduct && currentProduct.images && Object.keys(currentProduct.images).length > 1)
-  );
+
   if (swatchesContainer && colorGroup) {
-    if (productHasColorOptions) {
-      colorGroup.style.display = "";
-      swatchesContainer.innerHTML = "";
-      Object.keys(colorMap).forEach((key) => {
-        const btn = document.createElement("button");
-        btn.className = "swatch";
-        btn.dataset.color = key;
-        btn.style.background = colorMap[key];
-        btn.title = colorNames[key] || key;
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          selectColor(key, false, colorMap[key]);
-        });
-        swatchesContainer.appendChild(btn);
+    // Siempre mostrar la selección de colores
+    colorGroup.style.display = "";
+    swatchesContainer.innerHTML = "";
+
+    // Agregar opción "Original" primero
+    const originalBtn = document.createElement("button");
+    originalBtn.className = "swatch swatch-original";
+    originalBtn.dataset.color = "original";
+    originalBtn.innerHTML = "📷";
+    originalBtn.title = "Original (como en la foto)";
+    originalBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectColor("original");
+    });
+    swatchesContainer.appendChild(originalBtn);
+
+    // Agregar los demás colores
+    Object.keys(colorMap).forEach((key) => {
+      const btn = document.createElement("button");
+      btn.className = "swatch";
+      btn.dataset.color = key;
+      btn.style.background = colorMap[key];
+      btn.title = colorNames[key] || key;
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectColor(key, false, colorMap[key]);
       });
-      if (customColorPicker) customColorPicker.disabled = false;
-    } else {
-      colorGroup.style.display = "none";
-      selectedColor = "N/A";
-      isCustomColor = false;
-      if (customColorPicker) customColorPicker.disabled = true;
-    }
+      swatchesContainer.appendChild(btn);
+    });
+    if (customColorPicker) customColorPicker.disabled = false;
   }
 
   // Size buttons
@@ -928,6 +1010,18 @@ function setupModalControls() {
       closeBtn.dataset.bound = "1";
     }
   }
+
+  // Navigation buttons
+  const prevBtn = document.getElementById("modal-prev");
+  const nextBtn = document.getElementById("modal-next");
+  if (prevBtn && !prevBtn.dataset.bound) {
+    prevBtn.addEventListener("click", () => navigateModal(-1));
+    prevBtn.dataset.bound = "1";
+  }
+  if (nextBtn && !nextBtn.dataset.bound) {
+    nextBtn.addEventListener("click", () => navigateModal(1));
+    nextBtn.dataset.bound = "1";
+  }
 }
 
 function closeModal() {
@@ -939,20 +1033,72 @@ function closeModal() {
     modalKeydownAttached = false;
   }
   currentIndexInVisible = -1;
+  // Reset selections para evitar que los selectores múltiples persistan
+  try {
+    selectedSizes = [];
+    selectedColors = [];
+    selectedSize = null;
+    selectedColor = "default";
+    selectedColorHex = "#e0e0e0";
+    isCustomColor = false;
+    quantity = 1;
+    __autoAddAfterValidation = false;
+    __lastIntent = null;
+
+    const sizeDiv = document.getElementById("size-options");
+    if (sizeDiv && currentProduct && Array.isArray(currentProduct.sizes)) {
+      sizeDiv.innerHTML = "";
+      sizeDiv.className = "size-options-zara";
+      currentProduct.sizes.forEach((sz) => {
+        const btn = document.createElement("button");
+        btn.className = "size-btn";
+        btn.textContent = sz;
+        btn.type = "button";
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectSize(sz, btn);
+        });
+        sizeDiv.appendChild(btn);
+      });
+    }
+    // limpiar clases active en swatches
+    document
+      .querySelectorAll(".swatch, .swatch-small, .swatch-original")
+      .forEach((s) => s.classList.remove("active"));
+  } catch (e) {
+    console.warn("closeModal reset error (crop-tops):", e);
+  }
 }
 
 function selectColor(color, custom = false, hexValue = null) {
   selectedColor = color;
   isCustomColor = custom;
-  selectedColorHex = hexValue || colorMap[color] || "#e0e0e0";
+
+  // Handle "original" color selection
+  if (color === "original") {
+    selectedColorHex = "#8e44ad"; // Purple-ish color to represent "original"
+    isCustomColor = false;
+  } else {
+    selectedColorHex = hexValue || colorMap[color] || "#e0e0e0";
+  }
 
   // Clear color validation error
   const colorError = document.getElementById("color-error");
   if (colorError) colorError.style.display = "none";
 
-  // Actualizar imagen si hay una disponible para este color
+  // Handle "original" color - always show the default/first image
   const imgEl = document.getElementById("modal-img");
-  if (!custom && currentProduct.images && currentProduct.images[color]) {
+  if (color === "original") {
+    const fallbackSrc =
+      currentProduct.images.default ||
+      currentProduct.images.blanco ||
+      Object.values(currentProduct.images)[0] ||
+      "https://via.placeholder.com/560x560?text=Sin+imagen";
+    if (imgEl) {
+      imgEl.src = fallbackSrc;
+      console.log(`Imagen original: ${fallbackSrc}`);
+    }
+  } else if (!custom && currentProduct.images && currentProduct.images[color]) {
     if (imgEl) {
       imgEl.src = currentProduct.images[color];
       console.log(`Imagen cambiada a: ${currentProduct.images[color]}`);
@@ -986,6 +1132,12 @@ function selectColor(color, custom = false, hexValue = null) {
       (b) => b.dataset.color === color
     );
     if (btn) btn.classList.add("active");
+  }
+
+  // Handle "original" color selection specifically
+  if (color === "original") {
+    const originalBtn = document.querySelector(".swatch-original");
+    if (originalBtn) originalBtn.classList.add("active");
   }
 
   // Si venimos de una advertencia, guiar al siguiente paso o auto-ejecutar
@@ -1067,6 +1219,241 @@ function changeQty(delta) {
   const qtyEl = document.getElementById("qty-display");
   if (qtyEl) qtyEl.textContent = quantity;
   updateModalPrice();
+
+  // Mostrar mensaje para múltiples artículos
+  showMultipleSizeMessage();
+}
+
+function showMultipleSizeMessage() {
+  const sizeOptionsContainer = document.getElementById("size-options");
+  const sizeLabel = document.querySelector(
+    ".selection-group-zara:has(#size-options) .selection-label-zara"
+  );
+
+  if (!sizeOptionsContainer || !currentProduct) return;
+
+  if (quantity > 1) {
+    // Cambiar el label
+    if (sizeLabel) {
+      sizeLabel.textContent = `TALLAS (${quantity} artículos)`;
+    }
+
+    // Inicializar array de tallas si no existe
+    if (selectedSizes.length !== quantity) {
+      selectedSizes = new Array(quantity).fill(
+        selectedSize || currentProduct.sizes[0]
+      );
+    }
+
+    // Limpiar y recrear los selectores
+    sizeOptionsContainer.innerHTML = "";
+    sizeOptionsContainer.className = "size-options-zara multiple-selectors";
+
+    // Crear selector para cada artículo
+    for (let i = 0; i < quantity; i++) {
+      const selectorGroup = document.createElement("div");
+      selectorGroup.className = "size-selector-group";
+
+      const label = document.createElement("div");
+      label.className = "size-selector-label";
+      label.textContent = `Artículo ${i + 1}:`;
+      selectorGroup.appendChild(label);
+
+      const buttonsRow = document.createElement("div");
+      buttonsRow.className = "size-buttons-row";
+
+      currentProduct.sizes.forEach((size) => {
+        const btn = document.createElement("button");
+        btn.className = "size-btn size-btn-small";
+        btn.textContent = size;
+        btn.type = "button";
+
+        if (size === selectedSizes[i]) {
+          btn.classList.add("active");
+        }
+
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectMultipleSize(size, i);
+        });
+
+        buttonsRow.appendChild(btn);
+      });
+
+      selectorGroup.appendChild(buttonsRow);
+      // Color selector por artículo
+      const colorRow = document.createElement("div");
+      colorRow.className = "color-buttons-row";
+
+      const origBtn = document.createElement("button");
+      origBtn.className = "swatch swatch-small swatch-original";
+      origBtn.textContent = "📷";
+      origBtn.type = "button";
+      origBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectedColors[i] = "original";
+        selectorGroup
+          .querySelectorAll(".swatch")
+          .forEach((s) => s.classList.remove("active"));
+        origBtn.classList.add("active");
+        const colorError = document.getElementById("color-error");
+        if (colorError) colorError.style.display = "none";
+        checkAutoAddForMultiple();
+      });
+      colorRow.appendChild(origBtn);
+
+      Object.keys(colorMap).forEach((key) => {
+        const btn = document.createElement("button");
+        btn.className = "swatch swatch-small";
+        btn.type = "button";
+        btn.dataset.color = key;
+        btn.style.background = colorMap[key];
+        btn.title = colorNames[key] || key;
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectedColors[i] = key;
+          selectorGroup
+            .querySelectorAll(".swatch")
+            .forEach((s) => s.classList.remove("active"));
+          btn.classList.add("active");
+          const colorError = document.getElementById("color-error");
+          if (colorError) colorError.style.display = "none";
+          checkAutoAddForMultiple();
+        });
+        colorRow.appendChild(btn);
+      });
+
+      const custom = document.createElement("input");
+      custom.type = "color";
+      custom.className = "swatch-custom";
+      custom.addEventListener("change", (e) => {
+        selectedColors[i] = e.target.value;
+        selectorGroup
+          .querySelectorAll(".swatch")
+          .forEach((s) => s.classList.remove("active"));
+        const colorError = document.getElementById("color-error");
+        if (colorError) colorError.style.display = "none";
+        checkAutoAddForMultiple();
+      });
+      colorRow.appendChild(custom);
+
+      selectorGroup.appendChild(colorRow);
+      sizeOptionsContainer.appendChild(selectorGroup);
+    }
+
+    // Agregar mensaje informativo
+    const infoMessage = document.createElement("div");
+    infoMessage.className = "multiple-size-info";
+    infoMessage.innerHTML = `
+      <span class="info-icon">💡</span>
+      <span class="info-text">Selecciona una talla diferente para cada artículo</span>
+    `;
+    sizeOptionsContainer.appendChild(infoMessage);
+  } else {
+    // Restaurar selector simple
+    if (sizeLabel) {
+      sizeLabel.textContent = "TALLA";
+    }
+
+    selectedSizes = []; // Limpiar array
+    sizeOptionsContainer.innerHTML = "";
+    sizeOptionsContainer.className = "size-options-zara";
+
+    // Recrear botones simples
+    currentProduct.sizes.forEach((size) => {
+      const btn = document.createElement("button");
+      btn.className = "size-btn";
+      btn.textContent = size;
+      btn.type = "button";
+
+      if (size === selectedSize) {
+        btn.classList.add("active");
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectSize(size, btn);
+      });
+
+      sizeOptionsContainer.appendChild(btn);
+    });
+  }
+}
+
+function selectMultipleSize(size, index) {
+  selectedSizes[index] = size;
+  console.log(
+    `Talla seleccionada: ${size} para artículo ${index + 1}`,
+    selectedSizes
+  );
+
+  // Actualizar UI - solo el botón del grupo específico
+  const selectorGroups = document.querySelectorAll(".size-selector-group");
+  if (selectorGroups[index]) {
+    const buttons = selectorGroups[index].querySelectorAll(".size-btn");
+    buttons.forEach((btn) => btn.classList.remove("active"));
+
+    const selectedBtn = Array.from(buttons).find(
+      (btn) => btn.textContent === size
+    );
+    if (selectedBtn) {
+      selectedBtn.classList.add("active");
+    }
+  }
+
+  // Limpiar errores de validación
+  const sizeError = document.getElementById("size-error");
+  if (sizeError) sizeError.style.display = "none";
+
+  // Auto-add si venimos de advertencia y ahora están completas tallas+colores
+  try {
+    if (__autoAddAfterValidation) {
+      const allSizesSelected =
+        Array.isArray(selectedSizes) &&
+        selectedSizes.length === quantity &&
+        selectedSizes.every((s) => !!s);
+      const allColorsSelected =
+        Array.isArray(selectedColors) &&
+        selectedColors.length === quantity &&
+        selectedColors.every((c) => !!c && c !== "default" && c !== "N/A");
+      if (allSizesSelected && allColorsSelected) {
+        const intent = __lastIntent || "add";
+        __autoAddAfterValidation = false;
+        try {
+          closeAlert();
+        } catch (e) {}
+        setTimeout(() => {
+          if (intent === "buy") buyNowFromModal();
+          else addToCartFromModal();
+        }, 0);
+      }
+    }
+  } catch (e) {}
+}
+
+function checkAutoAddForMultiple() {
+  try {
+    if (!__autoAddAfterValidation) return;
+    const allSizesSelected =
+      Array.isArray(selectedSizes) &&
+      selectedSizes.length === quantity &&
+      selectedSizes.every((s) => !!s);
+    const allColorsSelected =
+      Array.isArray(selectedColors) &&
+      selectedColors.length === quantity &&
+      selectedColors.every((c) => !!c && c !== "default" && c !== "N/A");
+    if (allSizesSelected && allColorsSelected) {
+      const intent = __lastIntent || "add";
+      __autoAddAfterValidation = false;
+      try {
+        closeAlert();
+      } catch (e) {}
+      setTimeout(() => {
+        if (intent === "buy") buyNowFromModal();
+        else addToCartFromModal();
+      }, 0);
+    }
+  } catch (e) {}
 }
 
 function updateModalPrice() {
@@ -1103,25 +1490,21 @@ function updateModalPrice() {
 function validateSelections() {
   let isValid = true;
 
-  // Validar color (solo si el producto ofrece opciones de color)
-  const colorError = document.getElementById("color-error");
-  const productHasColorOptions = Boolean(
-    (currentProduct && Array.isArray(currentProduct.colors) && currentProduct.colors.length > 0) ||
-      (currentProduct && currentProduct.images && Object.keys(currentProduct.images).length > 1)
-  );
-  const missingColor = productHasColorOptions
-    ? selectedColor === "default" || !selectedColor || selectedColor === "N/A"
-    : false;
-  if (missingColor) {
-    if (colorError) colorError.style.display = "block";
-    isValid = false;
+  // Validar tallas
+  const sizeError = document.getElementById("size-error");
+  let missingSize = false;
+
+  if (quantity > 1) {
+    missingSize =
+      selectedSizes.length !== quantity ||
+      selectedSizes.some(
+        (size) => !size || size === null || size === undefined
+      );
   } else {
-    if (colorError) colorError.style.display = "none";
+    missingSize =
+      !selectedSize || selectedSize === null || selectedSize === undefined;
   }
 
-  // Validar talla
-  const sizeError = document.getElementById("size-error");
-  const missingSize = !selectedSize;
   if (missingSize) {
     if (sizeError) sizeError.style.display = "block";
     isValid = false;
@@ -1129,30 +1512,6 @@ function validateSelections() {
     if (sizeError) sizeError.style.display = "none";
   }
 
-  // Flujo secuencial: primero color, luego talla
-  if (missingColor) {
-    const actions = [
-      {
-        label: "Elegir color",
-        onClick: () => {
-          const sw = document.getElementById("color-swatches");
-          if (sw) {
-            sw.scrollIntoView({ behavior: "smooth", block: "center" });
-            try {
-              sw.classList.add("pulse");
-              setTimeout(() => sw.classList.remove("pulse"), 1200);
-            } catch (e) {}
-          }
-        },
-      },
-    ];
-    try {
-      showAlert("Por favor selecciona un color", actions);
-    } catch (e) {
-      alert("Por favor selecciona un color");
-    }
-    return false;
-  }
   if (missingSize) {
     const actions = [];
     if (currentProduct && Array.isArray(currentProduct.sizes)) {
@@ -1174,6 +1533,72 @@ function validateSelections() {
       alert("Selecciona tu talla");
     }
     return false;
+  }
+
+  // Validar color - OBLIGATORIO para bodys (001-008)
+  const isBodyProduct =
+    currentProduct &&
+    currentProduct.id &&
+    parseInt(currentProduct.id, 10) >= 1 &&
+    parseInt(currentProduct.id, 10) <= 8;
+
+  if (isBodyProduct) {
+    // Para bodys, el color es SIEMPRE obligatorio
+    const colorError = document.getElementById("color-error");
+    const hasColor =
+      isCustomColor ||
+      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
+
+    if (!hasColor) {
+      if (colorError) colorError.style.display = "block";
+      const actions = [
+        {
+          label: "Elegir color",
+          onClick: () => {
+            const el = document.getElementById("color-swatches");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          },
+        },
+      ];
+      try {
+        showAlert("Por favor selecciona un color antes de continuar", actions);
+      } catch (e) {
+        alert("Por favor selecciona un color");
+      }
+      return false;
+    } else {
+      if (colorError) colorError.style.display = "none";
+    }
+  } else if (quantity > 1) {
+    // Para otros productos, requerir color solo en múltiples artículos
+    const colorError = document.getElementById("color-error");
+    const hasColor =
+      isCustomColor ||
+      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
+    if (!hasColor) {
+      if (colorError) colorError.style.display = "block";
+      const actions = [
+        {
+          label: "Elegir color",
+          onClick: () => {
+            const el = document.getElementById("color-swatches");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          },
+        },
+      ];
+      try {
+        showAlert("Selecciona un color para los artículos múltiples", actions);
+      } catch (e) {
+        alert("Selecciona un color");
+      }
+      return false;
+    } else {
+      if (colorError) colorError.style.display = "none";
+    }
+  } else {
+    // Para productos que no son bodys ni múltiples artículos, ocultar error de color
+    const colorError = document.getElementById("color-error");
+    if (colorError) colorError.style.display = "none";
   }
 
   return isValid;
@@ -1211,10 +1636,22 @@ async function buyNowFromModal() {
   const customer = await collectCustomerInfo();
   if (customer === null) return;
 
-  const colorKey = isCustomColor ? selectedColorHex : selectedColor;
-  const colorDisplay = isCustomColor
-    ? `Personalizado (${selectedColorHex})`
-    : colorNames[selectedColor] || selectedColor;
+  let colorKey = null;
+  let colorDisplay = "No especificado";
+  if (isCustomColor) {
+    colorKey = selectedColorHex;
+    colorDisplay = `Personalizado (${selectedColorHex})`;
+  } else if (
+    selectedColor &&
+    selectedColor !== "default" &&
+    selectedColor !== "N/A"
+  ) {
+    colorKey = selectedColor;
+    colorDisplay =
+      selectedColor === "original"
+        ? "Original (como en la foto)"
+        : colorNames[selectedColor] || selectedColor;
+  }
 
   const unitPrice = calculatePrice(
     quantity,
@@ -1356,10 +1793,24 @@ function addToCartFromModal() {
     return;
   }
 
-  const colorKey = isCustomColor ? selectedColorHex : selectedColor;
-  const colorDisplay = isCustomColor
-    ? hexToColorName(selectedColorHex)
-    : colorNames[selectedColor] || selectedColor;
+  let colorKey = null;
+  let colorDisplay = "No especificado";
+  if (isCustomColor) {
+    colorKey = selectedColorHex;
+    colorDisplay = hexToColorName
+      ? hexToColorName(selectedColorHex)
+      : `Personalizado (${selectedColorHex})`;
+  } else if (
+    selectedColor &&
+    selectedColor !== "default" &&
+    selectedColor !== "N/A"
+  ) {
+    colorKey = selectedColor;
+    colorDisplay =
+      selectedColor === "original"
+        ? "Original (como en la foto)"
+        : colorNames[selectedColor] || selectedColor;
+  }
 
   const imageToUse =
     !isCustomColor &&
@@ -1583,119 +2034,8 @@ function ensureSharedUI() {
     }
   }
 
-  // product-modal
-  if (!document.getElementById("product-modal")) {
-    const modalHtml = `
-      <div id="product-modal" class="modal">
-        <div class="modal-content-professional">
-          <button class="modal-close" id="modal-close">×</button>
-          
-          <!-- Lado izquierdo: Imagen y controles -->
-          <div class="modal-left-section">
-            <!-- Imagen del producto -->
-            <div class="main-image-container" id="main-image-container">
-              <img id="modal-img" src="" alt="Producto" class="main-image"/>
-            </div>
-            <!-- Navegación entre artículos debajo de la imagen -->
-            <div class="image-nav-buttons">
-              <button id="modal-prev" class="btn-nav-secondary" aria-label="Anterior">Anterior</button>
-              <button id="modal-next" class="btn-nav-secondary" aria-label="Siguiente">Siguiente</button>
-            </div>
-
-            <!-- Título y código debajo de la foto -->
-            <div class="left-title-block" style="margin: .75rem 0 1rem 0; text-align:center;">
-              <h1 id="modal-name" class="product-title-zara" style="margin:0;font-size:1.1rem;"></h1>
-              <div id="modal-code-display" class="product-code-zara" style="opacity:.8;font-size:.9rem;"></div>
-            </div>
-            
-            <!-- Controles debajo de la imagen -->
-            <div class="product-controls-left">
-              <!-- Cantidad -->
-              <div class="qty-section-left">
-                <label class="control-label-left">CANTIDAD</label>
-                <div class="qty-controls-left">
-                  <button class="qty-btn-left" id="qty-decrease">−</button>
-                  <span id="qty-display" class="qty-display-left">1</span>
-                  <button class="qty-btn-left" id="qty-increase">+</button>
-                </div>
-                <div class="price-display-left">
-                  <span id="current-price-left" class="current-price-left">RD$0 c/u</span>
-                  <span id="total-price-left" class="total-price-left">Total: RD$0</span>
-                </div>
-              </div>
-              
-              <!-- Botones de acción -->
-              <div class="actions-left">
-                <button class="btn-add-bag-left" id="add-to-cart-btn">
-                  AÑADIR A LA BOLSA
-                </button>
-                <button class="btn-whatsapp-left" id="buy-now-btn">
-                  COMPRAR POR WHATSAPP
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Lado derecho: Información del producto -->
-          <div class="modal-product-details-zara">
-            
-            <!-- Precio principal removido por diseño -->
-            
-            <!-- Tabla de precios -->
-            <div class="pricing-tiers-zara">
-              <div class="pricing-title-zara">PRECIOS</div>
-              <div class="tier-row">
-                <span class="qty-text">Precio por unidad</span>
-                <span id="price-retail" class="tier-price">RD$0</span>
-              </div>
-              <div class="tier-row">
-                <span class="qty-text">Precio por docena</span>
-                <span id="price-dozen" class="tier-price">RD$0</span>
-              </div>
-            </div>
-            
-            <!-- Selección de color -->
-            <div class="selection-group-zara">
-              <label class="selection-label-zara">COLOR</label>
-              <div class="color-swatches-zara" id="color-swatches"></div>
-              <div class="custom-color-section">
-                <label class="custom-color-label">OTROS COLORES</label>
-                <input type="color" id="custom-color-picker" class="custom-color-zara"/>
-              </div>
-              <div class="validation-error" id="color-error">Selecciona un color</div>
-            </div>
-            
-            <!-- Selección de talla -->
-            <div class="selection-group-zara">
-              <label class="selection-label-zara">TALLA</label>
-              <div id="size-options" class="size-options-zara"></div>
-              <div class="size-note-zara">Tallas XL+ tienen recargo de +RD$50</div>
-              <div class="validation-error" id="size-error">Selecciona una talla</div>
-            </div>
-            
-            <!-- Detalles del producto -->
-            <div class="product-details-accordion-zara">
-              <details class="detail-section-zara">
-                <summary>DETALLES DEL PRODUCTO</summary>
-                <div class="detail-content-zara">
-                  <p>Crop top confeccionado con materiales premium. Diseño moderno y versátil.</p>
-                  <ul>
-                    <li>Material: Algodón 95% + Spandex 5%</li>
-                    <li>Gramaje: 180 GSM</li>
-                    <li>Cuidado: Lavable a máquina 30°C</li>
-                  </ul>
-                </div>
-              </details>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    document.body.insertAdjacentHTML("beforeend", modalHtml);
-    const prevBtn = document.getElementById("modal-prev");
-    const nextBtn = document.getElementById("modal-next");
-    if (prevBtn) prevBtn.addEventListener("click", () => navigateModal(-1));
-    if (nextBtn) nextBtn.addEventListener("click", () => navigateModal(1));
-  }
+  // El modal del producto se genera desde `app.js`.
+  // Se omite la creación local para evitar duplicados y mantener UI consistente.
 
   // alert-modal unificado (si falta)
   if (!document.getElementById("alert-modal")) {
@@ -1778,6 +2118,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Ensure shared overlays exist first
   try {
     ensureSharedUI();
+  } catch (e) {}
+  // Debug helper: mostrar estado de `products` al inicio para diagnosticar cargas
+  try {
+    console.log(
+      "[crop-tops-app] DOMContentLoaded - window.products length:",
+      Array.isArray(window.products) ? window.products.length : "(no definido)"
+    );
+    if (Array.isArray(window.products)) {
+      console.log(
+        "[crop-tops-app] sample product ids:",
+        window.products.slice(0, 20).map((p) => p && p.id)
+      );
+    }
   } catch (e) {}
 
   loadCart();

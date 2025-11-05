@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test - Mensaje Múltiples Tallas</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .instruction {
+        background: #e3f2fd;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #2196f3;
+        margin-bottom: 30px;
+      }
+      .test-steps {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .test-steps h3 {
+        color: #495057;
+        margin-bottom: 15px;
+      }
+      .test-steps ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .test-steps li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #c3e6cb;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 Test - Mensaje Múltiples Tallas</h1>
+
+      <div class="instruction">
+        <strong>💡 Funcionalidad implementada:</strong><br />
+        Cuando el cliente selecciona más de 1 artículo, aparece un mensaje
+        visual recordándole que puede seleccionar diferentes tallas para cada
+        artículo.
+      </div>
+
+      <div class="test-steps">
+        <h3>📋 Pasos para probar:</h3>
+        <ol>
+          <li>
+            Haz clic en "Probar en Página Principal" o "Probar en Crop Tops"
+          </li>
+          <li>Abre cualquier producto (haz clic en una imagen)</li>
+          <li>En el modal, busca los controles de cantidad (+ y -)</li>
+          <li>Cambia la cantidad de 1 a 2 o más</li>
+          <li>Observa que aparece un mensaje azul debajo de las tallas</li>
+          <li>Cambia la cantidad de vuelta a 1</li>
+          <li>El mensaje debe desaparecer</li>
+        </ol>
+      </div>
+
+      <button class="test-button" onclick="window.open('index.html', '_blank')">
+        🏠 Probar en Página Principal
+      </button>
+
+      <button
+        class="test-button"
+        onclick="window.open('crop-tops.html', '_blank')"
+      >
+        👕 Probar en Crop Tops
+      </button>
+
+      <div class="test-steps">
+        <h3>✅ Qué deberías ver:</h3>
+        <ul>
+          <li><strong>Cantidad 1:</strong> Sin mensaje adicional</li>
+          <li>
+            <strong>Cantidad 2+:</strong> Aparece mensaje azul con ícono 💡
+          </li>
+          <li>
+            <strong>Mensaje:</strong> "Recuerda: Puedes seleccionar diferentes
+            tallas para tus X artículos al agregar al carrito"
+          </li>
+          <li>
+            <strong>Animación:</strong> El mensaje aparece suavemente desde
+            arriba
+          </li>
+          <li><strong>Responsive:</strong> Se ve bien en móvil y desktop</li>
+        </ul>
+      </div>
+
+      <div class="success-message">
+        <strong>✅ Implementación completa:</strong><br />
+        • app.js: Función showMultipleSizeMessage()<br />
+        • crop-tops-app.js: Misma funcionalidad para crop tops<br />
+        • styles.css: Estilos con animaciones<br />
+        • Compatible con todas las páginas del sitio
+      </div>
+    </div>
+
+    <script>
+      console.log("🧪 Test preparado para mensaje de múltiples tallas");
+    </script>
+  </body>
+</html>

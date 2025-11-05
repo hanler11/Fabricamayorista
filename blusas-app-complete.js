@@ -403,6 +403,28 @@ function closeModal() {
     modalKeydownAttached = false;
   }
   currentIndexInVisible = -1;
+
+  // Reset selections para evitar persistencia al reabrir
+  try {
+    if (typeof selectedSizes !== "undefined") selectedSizes = [];
+    if (typeof selectedColors !== "undefined") selectedColors = [];
+    if (typeof selectedSize !== "undefined") selectedSize = null;
+    if (typeof selectedColor !== "undefined") selectedColor = "default";
+    if (typeof selectedColorHex !== "undefined") selectedColorHex = "#e0e0e0";
+    if (typeof isCustomColor !== "undefined") isCustomColor = false;
+    if (typeof quantity !== "undefined") quantity = 1;
+    __autoAddAfterValidation = false;
+    __lastIntent = null;
+
+    const qtyInput = document.getElementById("quantity-input");
+    if (qtyInput) qtyInput.value = 1;
+    // Limpiar clases seleccionadas en UI
+    document
+      .querySelectorAll(".size-option-zara, .color-option-zara")
+      .forEach((el) => el.classList.remove("selected"));
+  } catch (e) {
+    console.warn("closeModal reset error (blusas-complete):", e);
+  }
 }
 
 function selectColor(color) {

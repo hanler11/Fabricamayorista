@@ -91,6 +91,31 @@ function applySpecificPrices() {
     "022": { retail: 200, dozen: 150 },
     "023": { retail: 350, dozen: 250 },
     "024": { retail: 150, dozen: 100 },
+    // Crop Tops FM-00025 en adelante (025-048)
+    "025": { retail: 350, dozen: 300 },
+    "026": { retail: 225, dozen: 150 },
+    "027": { retail: 350, dozen: 250 },
+    "028": { retail: 200, dozen: 150 },
+    "029": { retail: 350, dozen: 300 },
+    "030": { retail: 300, dozen: 250 },
+    "031": { retail: 350, dozen: 300 },
+    "032": { retail: 350, dozen: 300 },
+    "033": { retail: 225, dozen: 200 },
+    "034": { retail: 250, dozen: 200 },
+    "035": { retail: 150, dozen: 100 },
+    "036": { retail: 300, dozen: 250 },
+    "037": { retail: 250, dozen: 200 },
+    "038": { retail: 250, dozen: 200 },
+    "039": { retail: 150, dozen: 100 },
+    "040": { retail: 150, dozen: 100 },
+    "041": { retail: 150, dozen: 100 },
+    "042": { retail: 150, dozen: 100 },
+    "043": { retail: 175, dozen: 125 },
+    "044": { retail: 250, dozen: 200 },
+    "045": { retail: 150, dozen: 100 },
+    "046": { retail: 250, dozen: 200 },
+    "047": { retail: 250, dozen: 200 },
+    "048": { retail: 175, dozen: 150 },
 
     // Blusas
     "049": { retail: 450, dozen: 375 },
@@ -106,6 +131,48 @@ function applySpecificPrices() {
 
   // Aplicar nombres específicos
   const specificNames = {
+    // Crop Tops 009-048
+    "009": "Crop Top",
+    "010": "Crop Top",
+    "011": "Crop Top",
+    "012": "Crop Top",
+    "013": "Crop Top",
+    "014": "Crop Top",
+    "015": "Crop Top",
+    "016": "Crop Top",
+    "017": "Crop Top",
+    "018": "Crop Top",
+    "019": "Crop Top",
+    "020": "Crop Top",
+    "021": "Crop Top",
+    "022": "Crop Top",
+    "023": "Crop Top",
+    "024": "Crop Top",
+    "025": "Crop Top",
+    "026": "Crop Top",
+    "027": "Crop Top",
+    "028": "Crop Top",
+    "029": "Crop Top",
+    "030": "Crop Top",
+    "031": "Crop Top",
+    "032": "Crop Top",
+    "033": "Crop Top",
+    "034": "Crop Top",
+    "035": "Crop Top",
+    "036": "Crop Top",
+    "037": "Crop Top",
+    "038": "Crop Top",
+    "039": "Crop Top",
+    "040": "Crop Top",
+    "041": "Crop Top",
+    "042": "Crop Top",
+    "043": "Crop Top",
+    "044": "Crop Top",
+    "045": "Crop Top",
+    "046": "Crop Top",
+    "047": "Crop Top",
+    "048": "Crop Top",
+    // Blusas
     "049": "Blusa doble vuelo abajo",
     "050": "Blusa manga corta (canelito)",
     // Bodys 001..008 (los 001 y 002 ya se renombran más abajo y se conservan)
@@ -138,6 +205,21 @@ function applySpecificPrices() {
 
 // Aplicar precios específicos después de crear los productos
 applySpecificPrices();
+
+// Unificar precios: usar 2 niveles (unidad y mayor 3+ = docena) para crop tops
+products.forEach((p) => {
+  if (p && p.price) {
+    const num = parseInt(p.id, 10);
+    // Para crop tops (009-048), usar sistema de 2 niveles
+    if (!isNaN(num) && num >= 9 && num <= 48) {
+      const dozen =
+        p.price.dozen !== undefined ? Number(p.price.dozen) : undefined;
+      if (dozen !== undefined && !Number.isNaN(dozen)) {
+        p.price.wholesale = dozen; // Mayor (3+) igual a docena
+      }
+    }
+  }
+});
 
 // ==========================
 // Sección: Danza (nueva categoría)
@@ -541,7 +623,7 @@ function applyPriceListMappings() {
     "064": { retail: 500, wholesale: 500, dozen: 500 },
 
     // Vestidos 065-124
-    "065": { retail: 700, wholesale: 700, dozen: 700 },
+    "065": { retail: 950, wholesale: 700, dozen: 700 },
     "066": { retail: 1100, wholesale: 1100, dozen: 1100 },
     "067": { retail: 1000, wholesale: 1000, dozen: 1000 },
     "068": { retail: 1100, wholesale: 1100, dozen: 1000 },
@@ -649,6 +731,133 @@ function applyPriceListMappings() {
 
 applyPriceListMappings();
 
+// Agregar producto 156 según petición del usuario: Pantalón campana / palazzo
+// Precios: Unidad RD$490, Mayor (3x1000 -> aprox RD$333.33 c/u), Por docena RD$290 (por unidad)
+products.push({
+  id: "156",
+  name: "Pantalón campana / Palazzo",
+  code: "FM-00156",
+  category: "pantalones",
+  price: { retail: 490, wholesale: 1000 / 3, dozen: 290 },
+  images: { default: `Images/156/156.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+});
+
+// Agregar producto 157: pantalón similar a 156 con mismos precios e imagen 157.jpg
+products.push({
+  id: "157",
+  name: "Pantalón campana / Palazzo (variante)",
+  code: "FM-00157",
+  category: "pantalones",
+  price: { retail: 490, wholesale: 1000 / 3, dozen: 290 },
+  images: { default: `Images/157/157.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+});
+
+// Agregar producto 158: Pantalón Seúl que debe mostrarse en Pantalones y en Conjuntos
+products.push({
+  id: "158",
+  name: "Pantalón Seúl",
+  code: "FM-00158",
+  // Lo colocamos por defecto en 'pantalones'
+  category: "pantalones",
+  // Precio por defecto (cuando se visualiza en Pantalones)
+  price: { retail: 490, wholesale: 1000 / 3, dozen: 290 },
+  // Precios alternativos cuando se muestra dentro de la sección 'conjuntos'
+  altPrices: {
+    conjuntos: { retail: 800, wholesale: 550, dozen: 490 },
+  },
+  // NOTE: No asignamos altCategories para evitar incluir 158 directamente en 'conjuntos'
+  images: { default: `Images/158/158.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+});
+
+// Agregar producto 159 según solicitud del usuario: Pantalón campana tela canalito uno
+// Precios: Unidad RD$350, Mayor RD$300, Por docena RD$300
+products.push({
+  id: "159",
+  name: "Pantalón campana tela canalito uno",
+  code: "FM-00159",
+  category: "pantalones",
+  price: { retail: 350, wholesale: 300, dozen: 300 },
+  images: { default: `Images/159/159.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  // Colores permitidos específicamente para este producto (solicitud del usuario)
+  // Usar las claves del colorMap: 'verde', 'amarillo-dorado', 'rosado claro'
+  colors: ["verde", "amarillo-dorado", "rosado claro"],
+});
+
+// Agregar producto 160: mismo esquema y precios que 159, colores solicitados
+products.push({
+  id: "160",
+  name: "Pantalón campana tela canalito dos",
+  code: "FM-00160",
+  category: "pantalones",
+  // Precios iguales a 159
+  price: { retail: 350, wholesale: 300, dozen: 300 },
+  images: { default: `Images/160/160.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  // Colores solicitados: negro, marrón, dorado y rojo
+  colors: ["negro", "marron", "dorado", "rojo"],
+});
+
+// Agregar producto 161: Conjunto / Set solicitado por el usuario
+products.push({
+  id: "161",
+  name: "Conjunto micro engomado completo",
+  code: "FM-00161",
+  category: "conjuntos",
+  // Precios según detalles proporcionados por el usuario
+  price: { retail: 750, wholesale: 500, dozen: 450 },
+  images: { default: `Images/161/161.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  // Descripción para mostrar en el modal (se usará por openModal())
+  description: `Conjunto o set. Tela micro engomado completo. Precios: Uno RD$750, Al por mayor RD$500, Por docena RD$450.`,
+  // Colores actualizados según indicación del usuario
+  colors: ["negro", "rosado claro", "verde"],
+});
+
+// Agregar producto 162: solicitado por el usuario (conjuntos)
+products.push({
+  id: "162",
+  name: "Blusa micro pantalón en seul calidad y terminación de primera",
+  code: "FM-00162",
+  category: "conjuntos",
+  // Precios proporcionados por el usuario
+  price: { retail: 800, wholesale: 550, dozen: 450 },
+  images: { default: `Images/162/162.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  // Descripción para el modal
+  description: `Blusa micro pantalón en seul, calidad y terminación de primera. Precios: Uno RD$800, Al por mayor RD$550, Por docena RD$450.`,
+  // Opcional: colores no especificados por el usuario; se dejará usar el conjunto global de colores
+});
+
+// Agregar producto 163: Conjunto de dos piezas solicitado por el usuario
+products.push({
+  id: "163",
+  name: "Conjunto de dos piezas",
+  code: "FM-00163",
+  category: "conjuntos",
+  // Precios proporcionados por el usuario
+  price: { retail: 900, wholesale: 650, dozen: 590 },
+  images: { default: `Images/163/163.jpg` },
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  // Descripción para el modal
+  description: `Conjunto o set de dos piezas. Precios: Uno RD$900, Al por mayor RD$650, Por docena RD$590.`,
+});
+
+// Aplicar precios de 158 al conjunto 138 según indicación del usuario
+(function apply158PricesTo138() {
+  try {
+    const prod138 = products.find((p) => p.id === "138");
+    if (prod138) {
+      prod138.price = { retail: 800, wholesale: 550, dozen: 490 };
+    }
+  } catch (e) {
+    console.warn("apply158PricesTo138 error", e);
+  }
+})();
+
 // Unificar precios no-Danza: usar 2 niveles (unidad y mayor 3+ = docena)
 (function unifyNonDanzaPricing() {
   try {
@@ -656,8 +865,13 @@ applyPriceListMappings();
       if (p && p.category !== "danza" && p.price) {
         const dozen =
           p.price.dozen !== undefined ? Number(p.price.dozen) : undefined;
-        if (dozen !== undefined && !Number.isNaN(dozen)) {
-          p.price.wholesale = dozen; // Mayor (3+) igual a docena
+        // Sólo establecer wholesale desde dozen si wholesale NO está explícitamente definido.
+        if (
+          dozen !== undefined &&
+          !Number.isNaN(dozen) &&
+          (p.price.wholesale === undefined || p.price.wholesale === null)
+        ) {
+          p.price.wholesale = dozen; // Mayor (3+) igual a docena solo si no hay wholesale
         }
       }
     });
@@ -726,6 +940,11 @@ try {
   window.getDanzaIds = getDanzaIds;
 } catch (e) {}
 
+// Exponer el arreglo de productos al `window` para que otras páginas lo reutilicen
+try {
+  window.products = products;
+} catch (e) {}
+
 // Secciones de ropa
 const seccionesRopa = [
   { id: "blusas", name: "Blusas", img: "Images/blusa/blusa.jpg" },
@@ -758,12 +977,63 @@ const prod001 = products.find((p) => p.id === "001");
 if (prod001) {
   prod001.name = "Body Manga Larga Doble Forro";
   prod001.code = `FM-00${prod001.id}`;
+  // Colores específicos para el producto 001
+  prod001.colors = ["negro", "blanco", "rojo", "rojo vino", "azul"];
 }
 // Ajustar producto 002 para que sea la versión de un forro (nombre similar)
 const prod002 = products.find((p) => p.id === "002");
 if (prod002) {
   prod002.name = "Body Manga Larga Forro Simple"; // mismo diseño pero de un forro
   prod002.code = `FM-00${prod002.id}`;
+  prod002.colors = ["negro", "blanco", "rojo", "rojo vino", "azul"];
+}
+
+// Configurar colores para productos 003 y 004
+const prod003 = products.find((p) => p.id === "003");
+if (prod003) {
+  prod003.colors = [
+    "negro",
+    "blanco",
+    "rojo",
+    "rojo vino",
+    "azul",
+    "marron",
+    "crema",
+    "beige",
+  ];
+}
+
+const prod004 = products.find((p) => p.id === "004");
+if (prod004) {
+  prod004.colors = [
+    "negro",
+    "blanco",
+    "rojo",
+    "rojo vino",
+    "azul",
+    "marron",
+    "crema",
+    "beige",
+  ];
+}
+
+// Configurar producto 005 - mismos colores que 002 pero con crema
+const prod005 = products.find((p) => p.id === "005");
+if (prod005) {
+  prod005.colors = ["negro", "blanco", "rojo", "rojo vino", "azul", "crema"];
+}
+
+// Producto 006 se deja sin configuración específica (usará todos los colores disponibles)
+
+// Configurar productos 007 y 008 - mismos colores que 002
+const prod007 = products.find((p) => p.id === "007");
+if (prod007) {
+  prod007.colors = ["negro", "blanco", "rojo", "rojo vino", "azul"];
+}
+
+const prod008 = products.find((p) => p.id === "008");
+if (prod008) {
+  prod008.colors = ["negro", "blanco", "rojo", "rojo vino", "azul"];
 }
 
 const colorMap = {
@@ -774,7 +1044,12 @@ const colorMap = {
   "rojo vino": "#8b0000",
   "amarillo-dorado": "#fbbf24",
   "rosado claro": "#f9a8d4",
+  verde: "#008000",
   naranja: "#ea580c",
+  marron: "#a52a2a",
+  dorado: "#daa520",
+  crema: "#f5deb3",
+  beige: "#f5f5dc",
 };
 
 const colorNames = {
@@ -785,7 +1060,13 @@ const colorNames = {
   "rojo vino": "Rojo Vino",
   "amarillo-dorado": "Amarillo Dorado",
   "rosado claro": "Rosado Claro",
+  verde: "Verde",
   naranja: "Naranja",
+  marron: "Marrón",
+  dorado: "Dorado",
+  crema: "Crema",
+  beige: "Beige",
+  original: "Original (como en la foto)",
 };
 
 let cart = [];
@@ -794,10 +1075,16 @@ let selectedColor = "default";
 let selectedColorHex = "#e0e0e0";
 let isCustomColor = false;
 let selectedSize = null;
+let selectedSizes = []; // Array para múltiples tallas
+let selectedColors = []; // Array para múltiples colores (cuando quantity>1)
 let quantity = 1;
 let searchQuery = "";
 // Estado para navegación dentro del modal
 let visibleProductIds = [];
+// Contexto de render actual (ej. 'pantalones', 'conjuntos') para ajustar precios y visibilidad
+let currentRenderCategoryContext = null;
+// Contexto desde el que se abrió el modal (se mantiene para usar altPrices en el modal)
+let modalOpenContext = null;
 let currentIndexInVisible = -1;
 let modalKeydownAttached = false;
 // Índice global para navegación por ID (permite cruzar categorías)
@@ -931,6 +1218,8 @@ function renderCategoryGrid(category) {
     case "body":
       // Body debe mostrar 001..008 propios (IDs de 3 dígitos) y excluir sólo los de Danza (category === 'danza' / IDs como "0001".."0008").
       inRange = (p) => {
+        // Aceptar productos que explícitamente pertenecen a la categoría 'body'
+        if (p && p.category === "body") return true;
         const n = parseInt(p.id, 10);
         if (Number.isNaN(n)) return false;
         // Rango de bodys por ID numérico
@@ -944,41 +1233,63 @@ function renderCategoryGrid(category) {
       break;
     case "vestidos":
       inRange = (p) => {
+        if (p && p.category === "vestidos") return true;
         const n = parseInt(p.id, 10);
         return !Number.isNaN(n) && n >= 65 && n <= 124;
       };
       break;
     case "faldas":
       inRange = (p) => {
+        if (p && p.category === "faldas") return true;
         const n = parseInt(p.id, 10);
         return !Number.isNaN(n) && n >= 125 && n <= 133;
       };
       break;
     case "pantalones":
       inRange = (p) => {
+        // Mostrar productos cuyo campo category explícitamente sea 'pantalones'
+        if (p && p.category === "pantalones") return true;
+        // Permitir también productos que declaren altCategories including 'pantalones'
+        if (
+          p &&
+          Array.isArray(p.altCategories) &&
+          p.altCategories.includes("pantalones")
+        )
+          return true;
         const n = parseInt(p.id, 10);
         return !Number.isNaN(n) && n >= 134 && n <= 137;
       };
       break;
     case "conjuntos":
       inRange = (p) => {
+        if (p && p.category === "conjuntos") return true;
+        // Permitir también productos que declaren altCategories including 'conjuntos'
+        if (
+          p &&
+          Array.isArray(p.altCategories) &&
+          p.altCategories.includes("conjuntos")
+        )
+          return true;
         const n = parseInt(p.id, 10);
         return !Number.isNaN(n) && n >= 138 && n <= 153;
       };
       break;
     case "enterizos":
       inRange = (p) => {
+        if (p && p.category === "enterizos") return true;
         const n = parseInt(p.id, 10);
         return !Number.isNaN(n) && n >= 154 && n <= 155;
       };
       break;
     case "danza":
       // Mostrar elementos marcados explícitamente como Danza
-      inRange = (p) => p.category === "danza";
+      inRange = (p) => p && p.category === "danza";
       break;
     default:
       inRange = () => false;
   }
+  // Marcar contexto de render para que createProductCard pueda usar altPrices
+  currentRenderCategoryContext = category;
   const list = products.filter((p) => inRange(p));
   const filtered = qNorm
     ? list.filter((p) =>
@@ -996,6 +1307,8 @@ function renderCategoryGrid(category) {
   filtered.forEach((p) => container.appendChild(createProductCard(p)));
   // Lista visible en esta categoría
   visibleProductIds = filtered.map((p) => p.id);
+  // limpiar contexto después de renderizar
+  currentRenderCategoryContext = null;
 }
 
 // Función para convertir códigos hex a nombres de colores entendibles
@@ -1061,7 +1374,7 @@ function getColorNameFromHex(hex) {
 }
 
 // Precio según reglas: detalle 450, mayor (>=3) 350, docena (>=12) 300
-function calculatePrice(qty, basePrice, size = null) {
+function calculatePrice(qty, basePrice, size = null, category = null) {
   if (!basePrice) return 0;
 
   const retail = Number(basePrice.retail || 0);
@@ -1073,9 +1386,16 @@ function calculatePrice(qty, basePrice, size = null) {
   );
 
   let price;
-  if (qty >= 12) price = dozen;
-  else if (qty >= 3) price = wholesale;
-  else price = retail;
+  // Regla especial: para la categoría 'body' las rebajas se aplican por docena
+  // (no hay nivel 'mayor' a partir de 3). Solo unidad y docena.
+  if (String(category).toLowerCase() === "body") {
+    if (qty >= 12) price = dozen;
+    else price = retail;
+  } else {
+    if (qty >= 12) price = dozen;
+    else if (qty >= 3) price = wholesale;
+    else price = retail;
+  }
 
   // Recargo de 50 pesos para tallas XL, 2XL, 3XL
   if (size && (size === "XL" || size === "2XL" || size === "3XL")) {
@@ -1196,16 +1516,23 @@ function createProductCard(p) {
         p.images[Object.keys(p.images).find((k) => k !== "default")])) ||
     "";
   const displayName = getDisplayName(p);
-  const retail = Number(p.price && p.price.retail ? p.price.retail : 0);
+  // Elegir precio según el contexto de render actual (p. ej. si p.altPrices.conjuntos existe y estamos en 'conjuntos')
+  const priceSource =
+    currentRenderCategoryContext &&
+    p.altPrices &&
+    p.altPrices[currentRenderCategoryContext]
+      ? p.altPrices[currentRenderCategoryContext]
+      : p.price || {};
+  const retail = Number(priceSource.retail || 0);
   const wholesale = Number(
-    p.price && p.price.wholesale !== undefined ? p.price.wholesale : retail
+    priceSource.wholesale !== undefined ? priceSource.wholesale : retail
   );
   const dozen = Number(
-    p.price && p.price.dozen !== undefined ? p.price.dozen : retail
+    priceSource.dozen !== undefined ? priceSource.dozen : retail
   );
   const isDanza = p.category === "danza";
   const mayorForNonDanza =
-    p.price && (p.price.dozen ?? p.price.wholesale ?? retail);
+    priceSource && (priceSource.dozen ?? priceSource.wholesale ?? retail);
   div.innerHTML = `
     <div class="product-card-minimal">
       <div class="product-image-wrapper">
@@ -1229,7 +1556,7 @@ function createProductCard(p) {
                 ? `
                 ${
                   wholesale !== retail
-                    ? `<div class="tier">Mayor (3+): RD$${wholesale}</div>`
+                    ? `<div class="tier">12 de docena (3+): RD$${wholesale}</div>`
                     : ``
                 }
                 <div class="tier best">Docena (12+): RD$${dozen}</div>
@@ -1252,6 +1579,8 @@ function createProductCard(p) {
   div.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
+    // Registrar desde qué contexto se abrió el modal para respetar altPrices
+    modalOpenContext = currentRenderCategoryContext;
     openModal(p.id);
   });
   div.addEventListener("keydown", (ev) => {
@@ -1304,7 +1633,10 @@ function renderCropTops() {
       <div class="product-info"><h3>${first.name}</h3></div>`;
     div.setAttribute("role", "button");
     div.setAttribute("tabindex", "0");
-    div.addEventListener("click", () => openModal(first.id));
+    div.addEventListener("click", () => {
+      modalOpenContext = "crop-tops";
+      openModal(first.id);
+    });
     return div;
   })();
 
@@ -1321,7 +1653,10 @@ function renderCropTops() {
         <div class="product-info"><h3>${prod.name}</h3></div>`;
       div.setAttribute("role", "button");
       div.setAttribute("tabindex", "0");
-      div.addEventListener("click", () => openModal(prod.id));
+      div.addEventListener("click", () => {
+        modalOpenContext = "crop-tops";
+        openModal(prod.id);
+      });
       return div;
     })(p);
     grid.appendChild(card);
@@ -1461,14 +1796,19 @@ function ensureSharedUI() {
             <!-- Tabla de precios -->
             <div class="pricing-tiers-zara">
               <div class="pricing-title-zara">PRECIOS</div>
-              <div class="tier-row">
+              <div class="tier-row" data-tier="retail" id="tier-row-retail">
                 <span class="qty-text">Precio por unidad</span>
                 <span class="tier-price" id="price-retail">RD$0</span>
               </div>
-              <div class="tier-row">
+              <div class="tier-row" data-tier="wholesale" id="tier-row-wholesale">
+                <span class="qty-text" id="label-wholesale">Mayor (3+)</span>
+                <span class="tier-price" id="price-wholesale">RD$0</span>
+              </div>
+              <div class="tier-row" data-tier="dozen" id="tier-row-dozen">
                 <span class="qty-text">Precio por docena</span>
                 <span class="tier-price" id="price-dozen">RD$0</span>
               </div>
+              <div id="special-offer-row" class="tier-row special-offer" style="display:none"></div>
             </div>
             
             <!-- Selección de color -->
@@ -1493,14 +1833,8 @@ function ensureSharedUI() {
             <div class="product-details-accordion-zara">
               <details class="detail-section-zara">
                 <summary>DETALLES DEL PRODUCTO</summary>
-                <div class="detail-content-zara">
-                  <p>Crop top confeccionado con materiales premium. Diseño moderno y versátil.</p>
-                  <ul>
-                    <li>Material: Algodón 95% + Spandex 5%</li>
-                    <li>Gramaje: 180 GSM</li>
-                    <li>Cuidado: Lavable a máquina 30°C</li>
-                  </ul>
-                </div>
+                <!-- Contenido dinámico: se rellena en openModal() según currentProduct -->
+                <div class="detail-content-zara" id="modal-details-content"></div>
               </details>
             </div>
           </div>
@@ -1910,7 +2244,12 @@ function openModal(id) {
   selectedColorHex = "#e0e0e0";
   isCustomColor = false;
   selectedSize = null;
+  selectedSizes = []; // Reset array de tallas múltiples
   quantity = 1;
+
+  // modalOpenContext queda establecido si la llamada provino de una tarjeta;
+  // si no, forzamos null (p. ej. apertura desde sugerencias o navegación global)
+  if (!modalOpenContext) modalOpenContext = null;
 
   const nameEl = document.getElementById("modal-name");
   const imgEl = document.getElementById("modal-img");
@@ -1936,53 +2275,8 @@ function openModal(id) {
   const codeEl = document.getElementById("modal-code-display");
   if (codeEl) codeEl.textContent = `${currentProduct.code}`;
 
-  // Actualizar tabla de precios con valores reales
-  // Mostrar tabla de precios con tres filas: unidad, mayor (3+) y docena (12+)
-  const pricingContainer = document.querySelector(".pricing-tiers-zara");
-  if (pricingContainer) {
-    const retail = Number(currentProduct.price.retail || 0);
-    const wholesale = Number(
-      currentProduct.price.wholesale !== undefined
-        ? currentProduct.price.wholesale
-        : retail
-    );
-    const dozen = Number(
-      currentProduct.price.dozen !== undefined
-        ? currentProduct.price.dozen
-        : retail
-    );
-    const isDanza = currentProduct.category === "danza";
-    if (isDanza) {
-      pricingContainer.innerHTML = `
-        <div class="pricing-title-zara">PRECIOS</div>
-        <div class="tier-row">
-          <span class="qty-text">Precio por unidad</span>
-          <span class="tier-price">RD$${retail}</span>
-        </div>
-        <div class="tier-row">
-          <span class="qty-text">Precio al por mayor (3+)</span>
-          <span class="tier-price">RD$${wholesale}</span>
-        </div>
-        <div class="tier-row">
-          <span class="qty-text">Precio por docena</span>
-          <span class="tier-price">RD$${dozen}</span>
-        </div>
-      `;
-    } else {
-      const mayor = dozen || wholesale || retail;
-      pricingContainer.innerHTML = `
-        <div class="pricing-title-zara">PRECIOS</div>
-        <div class="tier-row">
-          <span class="qty-text">Precio por unidad</span>
-          <span class="tier-price">RD$${retail}</span>
-        </div>
-        <div class="tier-row">
-          <span class="qty-text">Precio al por mayor (3+)</span>
-          <span class="tier-price">RD$${mayor}</span>
-        </div>
-      `;
-    }
-  }
+  // Actualizar tabla de precios con valores reales usando helper
+  renderPricingForModal(currentProduct, modalOpenContext);
 
   // mostrar default si existe, si no usar la primera imagen disponible (por ejemplo color blanco)
   const modalImgSrc =
@@ -2005,43 +2299,55 @@ function openModal(id) {
   }
   if (qtyEl) qtyEl.textContent = quantity;
 
-  // Configurar selector de color según si el producto tiene opciones de color
-  // Requerir color cuando el producto tenga múltiples imágenes/colores.
+  // SIEMPRE mostrar selector de color
   const swatches = document.getElementById("color-swatches");
   const colorGroup = swatches
     ? swatches.closest(".selection-group-zara")
     : null;
   const customPicker = document.getElementById("custom-color-picker");
-  // Determinar si el producto ofrece opciones de color (más de 1 imagen o lista explícita)
-  const productHasColorOptions = Boolean(
-    (currentProduct && Array.isArray(currentProduct.colors) && currentProduct.colors.length > 0) ||
-      (currentProduct && currentProduct.images && Object.keys(currentProduct.images).length > 1)
-  );
+
   if (swatches && colorGroup) {
-    if (productHasColorOptions) {
-      // Mostrar selector y poblar swatches
-      colorGroup.style.display = "";
-      swatches.innerHTML = "";
-      Object.keys(colorMap).forEach((key) => {
-        const btn = document.createElement("button");
-        btn.className = "swatch";
-        btn.dataset.color = key;
-        btn.style.background = colorMap[key];
-        btn.title = colorNames[key] || key;
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          selectColor(key, false, colorMap[key]);
-        });
-        swatches.appendChild(btn);
+    // Mostrar selector siempre
+    colorGroup.style.display = "";
+    swatches.innerHTML = "";
+
+    // Agregar opción "Original" primero
+    const originalBtn = document.createElement("button");
+    originalBtn.className = "swatch swatch-original";
+    originalBtn.dataset.color = "original";
+    originalBtn.title = "Color original (como en la foto)";
+    originalBtn.innerHTML = "📷"; // Icono de cámara para "original"
+    originalBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectColor("original", false, "#000000");
+    });
+    swatches.appendChild(originalBtn);
+
+    // Agregar colores disponibles
+    // Si el producto define una lista `colors`, usarla (restricción por producto).
+    // En caso contrario, usar todas las claves de colorMap.
+    const availableColors =
+      Array.isArray(currentProduct.colors) && currentProduct.colors.length
+        ? currentProduct.colors
+        : Object.keys(colorMap);
+    availableColors.forEach((key) => {
+      // Saltar si no existe en el mapa global (pero permitir hexs personalizados si vienen)
+      const hex =
+        colorMap[key] || (key && String(key).startsWith("#") ? key : null);
+      const btn = document.createElement("button");
+      btn.className = "swatch";
+      btn.dataset.color = key;
+      if (hex) btn.style.background = hex;
+      btn.title = colorNames[key] || key;
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectColor(key, false, hex || colorMap[key]);
       });
-      if (customPicker) customPicker.disabled = false;
-    } else {
-      // Producto sin opciones de color: ocultar selector y marcar color como N/A
-      colorGroup.style.display = "none";
-      selectedColor = "N/A";
-      isCustomColor = false;
-      if (customPicker) customPicker.disabled = true;
-    }
+      swatches.appendChild(btn);
+    });
+
+    // Habilitar selector de color personalizado
+    if (customPicker) customPicker.disabled = false;
   }
 
   const picker =
@@ -2063,6 +2369,51 @@ function openModal(id) {
       btn.addEventListener("click", () => selectSize(size, btn));
       sizeDiv.appendChild(btn);
     });
+  }
+
+  // Rellenar detalles del producto dinámicamente.
+  try {
+    const detailsEl = document.getElementById("modal-details-content");
+    if (detailsEl) {
+      // Priorizar campo 'description' si existe en el producto
+      if (currentProduct.description) {
+        detailsEl.innerHTML = `<p>${String(currentProduct.description)}</p>`;
+      } else if (currentProduct.detailsHtml) {
+        // Si existe HTML preformateado en el producto
+        detailsEl.innerHTML = String(currentProduct.detailsHtml);
+      } else {
+        // Fallback: solo mostrar el bloque de crop-top si el ID está en el rango de crop-tops
+        const idNumForDetails = parseInt(currentProduct.id, 10);
+        if (
+          !Number.isNaN(idNumForDetails) &&
+          idNumForDetails >= 9 &&
+          idNumForDetails <= 48
+        ) {
+          detailsEl.innerHTML = `
+            <p>Crop top confeccionado con materiales premium. Diseño moderno y versátil.</p>
+            <ul>
+              <li>Material: Algodón 95% + Spandex 5%</li>
+              <li>Gramaje: 180 GSM</li>
+              <li>Cuidado: Lavable a máquina 30°C</li>
+            </ul>
+          `;
+        } else {
+          // Generar una descripción genérica y lista de atributos básicos
+          const sizesList = Array.isArray(currentProduct.sizes)
+            ? currentProduct.sizes.join(", ")
+            : "";
+          detailsEl.innerHTML = `
+            <p>Detalles del producto: ${getDisplayName(currentProduct)}</p>
+            <ul>
+              <li>Categoría: ${currentProduct.category || "N/D"}</li>
+              ${sizesList ? `<li>Tallas disponibles: ${sizesList}</li>` : ""}
+            </ul>
+          `;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Error rellenando detalles dinámicos del modal", e);
   }
 
   const modal = document.getElementById("product-modal");
@@ -2094,6 +2445,38 @@ function openModal(id) {
   }
 
   updateModalPrice();
+}
+
+// Renderiza los valores de las filas de precio dentro del modal (reutilizable)
+function renderPricingForModal(product, context) {
+  try {
+    const pricingContainer = document.querySelector(".pricing-tiers-zara");
+    if (!pricingContainer) return;
+
+    const priceSource =
+      context && product.altPrices && product.altPrices[context]
+        ? product.altPrices[context]
+        : product.price || {};
+    const retail = Number(priceSource.retail || 0);
+    const dozen = Number(
+      priceSource.dozen !== undefined ? priceSource.dozen : retail
+    );
+
+    // Usar la estructura idéntica a blusas - siempre mostrar ambas filas
+    pricingContainer.innerHTML = `
+      <div class="pricing-title-zara">PRECIOS</div>
+      <div class="tier-row">
+        <span class="qty-text">Precio por unidad</span>
+        <span id="price-retail" class="tier-price">RD$${retail}</span>
+      </div>
+      <div class="tier-row">
+        <span class="qty-text">Precio por docena</span>
+        <span id="price-dozen" class="tier-price">RD$${dozen}</span>
+      </div>
+    `;
+  } catch (e) {
+    console.warn("renderPricingForModal error", e);
+  }
 }
 
 function onModalKeydown(e) {
@@ -2200,48 +2583,24 @@ function navigateModal(delta) {
     // Pricing (3 niveles solo para Danza; 2 niveles para no-Danza)
     const pricingContainer = document.querySelector(".pricing-tiers-zara");
     if (pricingContainer) {
-      const retail = Number(currentProduct.price.retail || 0);
+      const priceSource =
+        modalOpenContext &&
+        currentProduct.altPrices &&
+        currentProduct.altPrices[modalOpenContext]
+          ? currentProduct.altPrices[modalOpenContext]
+          : currentProduct.price || {};
+      const retail = Number(priceSource.retail || 0);
       const wholesale = Number(
-        currentProduct.price.wholesale !== undefined
-          ? currentProduct.price.wholesale
-          : retail
+        priceSource.wholesale !== undefined ? priceSource.wholesale : retail
       );
       const dozen = Number(
-        currentProduct.price.dozen !== undefined
-          ? currentProduct.price.dozen
-          : retail
+        priceSource.dozen !== undefined ? priceSource.dozen : retail
       );
       const isDanzaPricing = currentProduct.category === "danza";
-      if (isDanzaPricing) {
-        pricingContainer.innerHTML = `
-          <div class="pricing-title-zara">PRECIOS</div>
-          <div class="tier-row">
-            <span class="qty-text">Precio por unidad</span>
-            <span class="tier-price">RD$${retail}</span>
-          </div>
-          <div class="tier-row">
-            <span class="qty-text">Precio al por mayor (3+)</span>
-            <span class="tier-price">RD$${wholesale}</span>
-          </div>
-          <div class="tier-row">
-            <span class="qty-text">Precio por docena</span>
-            <span class="tier-price">RD$${dozen}</span>
-          </div>
-        `;
-      } else {
-        const mayor = dozen || wholesale || retail;
-        pricingContainer.innerHTML = `
-          <div class="pricing-title-zara">PRECIOS</div>
-          <div class="tier-row">
-            <span class="qty-text">Precio por unidad</span>
-            <span class="tier-price">RD$${retail}</span>
-          </div>
-          <div class="tier-row">
-            <span class="qty-text">Precio al por mayor (3+)</span>
-            <span class="tier-price">RD$${mayor}</span>
-          </div>
-        `;
-      }
+      const isSpecial156 =
+        currentProduct && String(currentProduct.id) === "156";
+      // Actualizar precios usando helper para mantener consistencia
+      renderPricingForModal(currentProduct, modalOpenContext);
     }
 
     // Imagen
@@ -2271,8 +2630,12 @@ function navigateModal(delta) {
       : null;
     const customPicker = document.getElementById("custom-color-picker");
     const productHasColorOptions = Boolean(
-      (currentProduct && Array.isArray(currentProduct.colors) && currentProduct.colors.length > 0) ||
-        (currentProduct && currentProduct.images && Object.keys(currentProduct.images).length > 1)
+      (currentProduct &&
+        Array.isArray(currentProduct.colors) &&
+        currentProduct.colors.length > 0) ||
+        (currentProduct &&
+          currentProduct.images &&
+          Object.keys(currentProduct.images).length > 1)
     );
     if (swatches && colorGroup) {
       if (productHasColorOptions) {
@@ -2341,12 +2704,55 @@ function closeModal() {
     modalKeydownAttached = false;
   }
   currentIndexInVisible = -1;
+  // limpiar contexto del modal
+  modalOpenContext = null;
+
+  // Reset de estado relacionado con selecciones múltiples para evitar que
+  // los selectores queden persistentes si el usuario cierra y vuelve a abrir.
+  try {
+    selectedSizes = [];
+    selectedColors = [];
+    selectedSize = null;
+    selectedColor = "default";
+    selectedColorHex = "#e0e0e0";
+    isCustomColor = false;
+    quantity = 1;
+    __autoAddAfterValidation = false;
+    __lastIntent = null;
+
+    // Restaurar el DOM de tallas a su estado simple (botones) si el modal sigue en el DOM
+    const sizeDiv = document.getElementById("size-options");
+    if (sizeDiv && currentProduct && Array.isArray(currentProduct.sizes)) {
+      sizeDiv.innerHTML = "";
+      sizeDiv.className = "size-options-zara";
+      currentProduct.sizes.forEach((sz) => {
+        const btn = document.createElement("button");
+        btn.className = "size-btn";
+        btn.textContent = sz;
+        btn.type = "button";
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectSize(sz, btn);
+        });
+        sizeDiv.appendChild(btn);
+      });
+    }
+  } catch (e) {
+    console.warn("closeModal reset error", e);
+  }
 }
 
 function selectColor(color, custom = false, hexValue = null) {
   selectedColor = color;
   isCustomColor = custom;
-  selectedColorHex = hexValue || colorMap[color] || "#e0e0e0";
+
+  // Handle "original" color selection
+  if (color === "original") {
+    selectedColorHex = "#8e44ad"; // Purple-ish color to represent "original"
+    isCustomColor = false;
+  } else {
+    selectedColorHex = hexValue || colorMap[color] || "#e0e0e0";
+  }
 
   // Clear color validation error
   const colorError = document.getElementById("color-error");
@@ -2358,7 +2764,19 @@ function selectColor(color, custom = false, hexValue = null) {
     currentProduct &&
     currentProduct.images &&
     Object.keys(currentProduct.images).length === 1;
-  if (
+
+  // Handle "original" color - always show the default/first image
+  if (color === "original" || hasSingleImage) {
+    const fallbackSrc =
+      currentProduct.images.default ||
+      currentProduct.images.blanco ||
+      Object.values(currentProduct.images)[0] ||
+      "https://via.placeholder.com/560x560?text=Sin+imagen";
+    if (imgEl) {
+      imgEl.src = fallbackSrc;
+      console.log(`Imagen original/fallback: ${fallbackSrc}`);
+    }
+  } else if (
     !custom &&
     !hasSingleImage &&
     currentProduct.images &&
@@ -2406,6 +2824,12 @@ function selectColor(color, custom = false, hexValue = null) {
       (b) => b.dataset.color === color
     );
     if (btn) btn.classList.add("active");
+  }
+
+  // Handle "original" color selection specifically
+  if (color === "original") {
+    const originalBtn = document.querySelector(".swatch-original");
+    if (originalBtn) originalBtn.classList.add("active");
   }
 
   // Si venimos de una advertencia y ya hay talla seleccionada, auto-agregar
@@ -2499,11 +2923,278 @@ function changeQty(delta) {
   const qtyEl = document.getElementById("qty-display");
   if (qtyEl) qtyEl.textContent = quantity;
   updateModalPrice();
+
+  // Mostrar mensaje para múltiples artículos
+  showMultipleSizeMessage();
+}
+
+function showMultipleSizeMessage() {
+  const sizeOptionsContainer = document.getElementById("size-options");
+  const sizeLabel = document.querySelector(
+    ".selection-group-zara:has(#size-options) .selection-label-zara"
+  );
+
+  if (!sizeOptionsContainer || !currentProduct) return;
+
+  if (quantity > 1) {
+    // Cambiar el label
+    if (sizeLabel) {
+      sizeLabel.textContent = `TALLAS (${quantity} artículos)`;
+    }
+
+    // Inicializar array de tallas si no existe
+    if (selectedSizes.length !== quantity) {
+      selectedSizes = new Array(quantity).fill(
+        selectedSize || currentProduct.sizes[0]
+      );
+    }
+    // Inicializar array de colores por artículo si no existe
+    if (selectedColors.length !== quantity) {
+      selectedColors = new Array(quantity).fill(null);
+    }
+
+    // Limpiar y recrear los selectores
+    sizeOptionsContainer.innerHTML = "";
+    sizeOptionsContainer.className = "size-options-zara multiple-selectors";
+
+    // Crear selector para cada artículo
+    for (let i = 0; i < quantity; i++) {
+      const selectorGroup = document.createElement("div");
+      selectorGroup.className = "size-selector-group";
+
+      const label = document.createElement("div");
+      label.className = "size-selector-label";
+      label.textContent = `Artículo ${i + 1}:`;
+      selectorGroup.appendChild(label);
+
+      const buttonsRow = document.createElement("div");
+      buttonsRow.className = "size-buttons-row";
+
+      currentProduct.sizes.forEach((size) => {
+        const btn = document.createElement("button");
+        btn.className = "size-btn size-btn-small";
+        btn.textContent = size;
+        btn.type = "button";
+
+        if (size === selectedSizes[i]) {
+          btn.classList.add("active");
+        }
+
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectMultipleSize(size, i);
+        });
+
+        buttonsRow.appendChild(btn);
+      });
+
+      selectorGroup.appendChild(buttonsRow);
+      // --- Color selector por artículo ---
+      const colorRow = document.createElement("div");
+      colorRow.className = "color-buttons-row";
+
+      // Botón original
+      const orig = document.createElement("button");
+      orig.className = "swatch swatch-small swatch-original";
+      orig.textContent = "📷";
+      orig.type = "button";
+      orig.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectedColors[i] = "original";
+        // marcar activo en este grupo
+        const group = selectorGroup;
+        group
+          .querySelectorAll(".swatch")
+          .forEach((s) => s.classList.remove("active"));
+        orig.classList.add("active");
+        // limpiar error
+        const colorError = document.getElementById("color-error");
+        if (colorError) colorError.style.display = "none";
+        checkAutoAddForMultiple();
+      });
+      // marcar si ya estaba seleccionado
+      if (selectedColors[i] === "original") orig.classList.add("active");
+      colorRow.appendChild(orig);
+
+      // Determinar colores disponibles por producto (si está definido) o usar el mapa global
+      const availableColors =
+        Array.isArray(currentProduct.colors) && currentProduct.colors.length
+          ? currentProduct.colors
+          : Object.keys(colorMap);
+      availableColors.forEach((key) => {
+        const hex =
+          colorMap[key] || (key && String(key).startsWith("#") ? key : null);
+        const btn = document.createElement("button");
+        btn.className = "swatch swatch-small";
+        btn.dataset.color = key;
+        if (hex) btn.style.background = hex;
+        btn.title = colorNames[key] || key;
+        btn.type = "button";
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectedColors[i] = key;
+          // marcar activo solo en este grupo
+          const group = selectorGroup;
+          group
+            .querySelectorAll(".swatch")
+            .forEach((s) => s.classList.remove("active"));
+          btn.classList.add("active");
+          const colorError = document.getElementById("color-error");
+          if (colorError) colorError.style.display = "none";
+          checkAutoAddForMultiple();
+        });
+        // marcar activo si ya se seleccionó antes
+        if (selectedColors[i] && selectedColors[i] === key) {
+          btn.classList.add("active");
+        }
+        colorRow.appendChild(btn);
+      });
+
+      // color personalizado por artículo
+      const custom = document.createElement("input");
+      custom.type = "color";
+      custom.className = "swatch-custom";
+      custom.addEventListener("change", (e) => {
+        selectedColors[i] = e.target.value;
+        // desactivar otras swatches en este grupo
+        const group = selectorGroup;
+        group
+          .querySelectorAll(".swatch")
+          .forEach((s) => s.classList.remove("active"));
+        if (colorRow && colorRow.contains(custom))
+          custom.classList.add("active");
+        const colorError = document.getElementById("color-error");
+        if (colorError) colorError.style.display = "none";
+        checkAutoAddForMultiple();
+      });
+      colorRow.appendChild(custom);
+
+      selectorGroup.appendChild(colorRow);
+      sizeOptionsContainer.appendChild(selectorGroup);
+    }
+
+    // Agregar mensaje informativo
+    const infoMessage = document.createElement("div");
+    infoMessage.className = "multiple-size-info";
+    infoMessage.innerHTML = `
+      <span class="info-icon">💡</span>
+      <span class="info-text">Selecciona una talla diferente para cada artículo</span>
+    `;
+    sizeOptionsContainer.appendChild(infoMessage);
+  } else {
+    // Restaurar selector simple
+    if (sizeLabel) {
+      sizeLabel.textContent = "TALLA";
+    }
+
+    selectedSizes = []; // Limpiar array
+    sizeOptionsContainer.innerHTML = "";
+    sizeOptionsContainer.className = "size-options-zara";
+
+    // Recrear botones simples
+    currentProduct.sizes.forEach((size) => {
+      const btn = document.createElement("button");
+      btn.className = "size-btn";
+      btn.textContent = size;
+      btn.type = "button";
+
+      if (size === selectedSize) {
+        btn.classList.add("active");
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectSize(size, btn);
+      });
+
+      sizeOptionsContainer.appendChild(btn);
+    });
+  }
+}
+
+function selectMultipleSize(size, index) {
+  selectedSizes[index] = size;
+  console.log(
+    `Talla seleccionada: ${size} para artículo ${index + 1}`,
+    selectedSizes
+  );
+
+  // Actualizar UI - solo el botón del grupo específico
+  const selectorGroups = document.querySelectorAll(".size-selector-group");
+  if (selectorGroups[index]) {
+    const buttons = selectorGroups[index].querySelectorAll(".size-btn");
+    buttons.forEach((btn) => btn.classList.remove("active"));
+
+    const selectedBtn = Array.from(buttons).find(
+      (btn) => btn.textContent === size
+    );
+    if (selectedBtn) {
+      selectedBtn.classList.add("active");
+    }
+  }
+
+  // Limpiar errores de validación
+  const sizeError = document.getElementById("size-error");
+  if (sizeError) sizeError.style.display = "none";
+
+  // Si venimos de una advertencia y ya hay colores/tallas por artículo, auto-agregar
+  try {
+    if (__autoAddAfterValidation) {
+      const allSizesSelected =
+        Array.isArray(selectedSizes) &&
+        selectedSizes.length === quantity &&
+        selectedSizes.every((s) => !!s);
+      const allColorsSelected =
+        Array.isArray(selectedColors) &&
+        selectedColors.length === quantity &&
+        selectedColors.every((c) => !!c && c !== "default" && c !== "N/A");
+      if (allSizesSelected && allColorsSelected) {
+        const intent = __lastIntent || "add";
+        __autoAddAfterValidation = false;
+        closeAlert();
+        setTimeout(() => {
+          if (intent === "buy") buyNowFromModal();
+          else addToCartFromModal();
+        }, 0);
+      }
+    }
+  } catch (e) {}
+}
+
+// Comprueba auto-add para múltiples después de seleccionar color/talla
+function checkAutoAddForMultiple() {
+  try {
+    if (!__autoAddAfterValidation) return;
+    const allSizesSelected =
+      Array.isArray(selectedSizes) &&
+      selectedSizes.length === quantity &&
+      selectedSizes.every((s) => !!s);
+    const allColorsSelected =
+      Array.isArray(selectedColors) &&
+      selectedColors.length === quantity &&
+      selectedColors.every((c) => !!c && c !== "default" && c !== "N/A");
+    if (allSizesSelected && allColorsSelected) {
+      const intent = __lastIntent || "add";
+      __autoAddAfterValidation = false;
+      try {
+        closeAlert();
+      } catch (e) {}
+      setTimeout(() => {
+        if (intent === "buy") buyNowFromModal();
+        else addToCartFromModal();
+      }, 0);
+    }
+  } catch (e) {}
 }
 
 function updateModalPrice() {
   if (!currentProduct) return;
-  const unit = calculatePrice(quantity, currentProduct.price, selectedSize);
+  const unit = calculatePrice(
+    quantity,
+    currentProduct.price,
+    selectedSize,
+    currentProduct && currentProduct.category
+  );
   // Actualizar panel de la izquierda (debajo de la imagen)
   const leftUnitEl = document.getElementById("current-price-left");
   const leftTotalEl = document.getElementById("total-price-left");
@@ -2519,6 +3210,34 @@ function updateModalPrice() {
       text += ` (Ahorras RD$${savings.toFixed(2)})`;
     }
     leftTotalEl.textContent = text;
+  }
+
+  // Marcar la fila activa en la tabla de precios (retail / wholesale / dozen)
+  try {
+    const pricingContainer = document.querySelector(".pricing-tiers-zara");
+    if (pricingContainer) {
+      const tier =
+        quantity >= 12 ? "dozen" : quantity >= 3 ? "wholesale" : "retail";
+      // Si el producto es 'body', no existe la fila 'wholesale'
+      const isBody = String(currentProduct.category).toLowerCase() === "body";
+      // Limpiar estados
+      pricingContainer.querySelectorAll(".tier-row").forEach((r) => {
+        r.classList.remove("active");
+      });
+      if (tier === "wholesale" && isBody) {
+        // En body no aplicamos wholesale; highlight only retail or dozen
+        const chosen =
+          quantity >= 12
+            ? document.getElementById("tier-row-dozen")
+            : document.getElementById("tier-row-retail");
+        if (chosen) chosen.classList.add("active");
+      } else {
+        const row = document.getElementById("tier-row-" + tier);
+        if (row) row.classList.add("active");
+      }
+    }
+  } catch (e) {
+    // noop
   }
 }
 
@@ -2564,45 +3283,30 @@ function closeAlert() {
 }
 
 // Validar selecciones obligatorias con modal centrado
-function validateSelections() {
+function validateSelections(action = "add") {
   let isValid = true;
-  // Validar color
-  const colorError = document.getElementById("color-error");
-  // Determinar si el producto ofrece opciones de color (más de 1 imagen o lista explícita)
-  const productHasColorOptions = Boolean(
-    (currentProduct && Array.isArray(currentProduct.colors) && currentProduct.colors.length > 0) ||
-      (currentProduct && currentProduct.images && Object.keys(currentProduct.images).length > 1)
-  );
-  const missingColor = productHasColorOptions
-    ? selectedColor === "default" || !selectedColor || selectedColor === "N/A"
-    : false;
-  if (missingColor) {
-    if (colorError) colorError.style.display = "block";
-    isValid = false;
-  } else if (colorError) colorError.style.display = "none";
 
-  // Validar talla
+  // NOTA: El color ahora es opcional por petición del cliente.
+  // Validamos únicamente la(s) talla(s) (si falta talla, bloquear la acción).
   const sizeError = document.getElementById("size-error");
-  const missingSize = !selectedSize;
+  let missingSize = false;
+
+  if (quantity > 1) {
+    missingSize =
+      selectedSizes.length !== quantity ||
+      selectedSizes.some(
+        (size) => !size || size === null || size === undefined
+      );
+  } else {
+    missingSize =
+      !selectedSize || selectedSize === null || selectedSize === undefined;
+  }
+
   if (missingSize) {
     if (sizeError) sizeError.style.display = "block";
     isValid = false;
   } else if (sizeError) sizeError.style.display = "none";
 
-  // Flujo secuencial tipo Blusas: primero color, luego talla
-  if (missingColor) {
-    const actions = [
-      {
-        label: "Elegir color",
-        action: () => {
-          const el = document.getElementById("color-swatches");
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-        },
-      },
-    ];
-    showAlert("Por favor selecciona un color", actions);
-    return false;
-  }
   if (missingSize) {
     const sizeButtons = Array.from(
       document.querySelectorAll("#size-options .size-btn")
@@ -2613,6 +3317,69 @@ function validateSelections() {
     });
     showAlert("Selecciona tu talla", actions);
     return false;
+  }
+
+  // Validar selección de color - OBLIGATORIO para bodys (001-008)
+  const isBodyProduct =
+    currentProduct &&
+    currentProduct.id &&
+    parseInt(currentProduct.id, 10) >= 1 &&
+    parseInt(currentProduct.id, 10) <= 8;
+
+  if (isBodyProduct) {
+    // Para bodys, el color es SIEMPRE obligatorio
+    const colorError = document.getElementById("color-error");
+    const hasColor =
+      isCustomColor ||
+      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
+
+    if (!hasColor) {
+      if (colorError) colorError.style.display = "block";
+      const actions = [
+        {
+          label: "Elegir color",
+          action: () => {
+            const el = document.getElementById("color-swatches");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          },
+        },
+      ];
+      showAlert("Por favor selecciona un color antes de continuar", actions);
+      return false;
+    } else {
+      if (colorError) colorError.style.display = "none";
+    }
+  } else if (
+    // Para otros productos, requerir color solo en múltiples artículos de crop-tops
+    quantity > 1 &&
+    String(action || "").toLowerCase() === "add" &&
+    modalOpenContext === "crop-tops"
+  ) {
+    const colorError = document.getElementById("color-error");
+    const missingColor =
+      !Array.isArray(selectedColors) ||
+      selectedColors.length !== quantity ||
+      selectedColors.some((c) => !c || c === "default" || c === "N/A");
+    if (missingColor) {
+      if (colorError) colorError.style.display = "block";
+      const actions = [
+        {
+          label: "Elegir color",
+          action: () => {
+            const el = document.getElementById("size-options");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          },
+        },
+      ];
+      showAlert("Selecciona un color para cada artículo", actions);
+      return false;
+    } else {
+      if (colorError) colorError.style.display = "none";
+    }
+  } else {
+    // En los demás casos, asegurarnos de ocultar cualquier mensaje de color
+    const colorError = document.getElementById("color-error");
+    if (colorError) colorError.style.display = "none";
   }
 
   return isValid;
@@ -2634,7 +3401,7 @@ function generateOrderId() {
 async function buyNowFromModal() {
   __lastIntent = "buy";
   if (!currentProduct) return;
-  if (!validateSelections()) {
+  if (!validateSelections("buy")) {
     // activar auto-add cuando el usuario complete selección
     __autoAddAfterValidation = true;
     return;
@@ -2651,15 +3418,28 @@ async function buyNowFromModal() {
   const customer = await collectCustomerInfo();
   if (customer === null) return; // usuario canceló
 
-  const colorKey = isCustomColor ? selectedColorHex : selectedColor;
-  const colorDisplay = isCustomColor
-    ? `Personalizado (${selectedColorHex})`
-    : colorNames[selectedColor] || selectedColor;
+  let colorKey = null;
+  let colorDisplay = "No especificado";
+  if (isCustomColor) {
+    colorKey = selectedColorHex;
+    colorDisplay = `Personalizado (${selectedColorHex})`;
+  } else if (
+    selectedColor &&
+    selectedColor !== "default" &&
+    selectedColor !== "N/A"
+  ) {
+    colorKey = selectedColor;
+    colorDisplay =
+      selectedColor === "original"
+        ? "Original (como en la foto)"
+        : colorNames[selectedColor] || selectedColor;
+  }
 
   const unitPrice = calculatePrice(
     quantity,
     currentProduct.price,
-    selectedSize
+    selectedSize,
+    currentProduct && currentProduct.category
   );
   const subtotal = unitPrice * quantity;
   const savings = (currentProduct.price.retail - unitPrice) * quantity;
@@ -2688,20 +3468,47 @@ async function buyNowFromModal() {
   const displayNameSingle = getDisplayName(currentProduct);
   message += `*${displayNameSingle}*\n`;
   message += `Código: ${currentProduct.code}\n`;
-  message += `Talla: ${selectedSize}\n`;
-  message += `Color: ${colorDisplay}\n`;
-  const tierText =
-    quantity >= 12 ? "DOCENA" : quantity >= 3 ? "MAYOR" : "DETALLE";
-  message += `Cantidad: ${quantity} un. [${tierText}]\n`;
-  message += `Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
-  message += `Subtotal: RD$${subtotal.toFixed(2)}\n`;
+  if (
+    quantity > 1 &&
+    Array.isArray(selectedSizes) &&
+    selectedSizes.length === quantity
+  ) {
+    // Listar cada artículo con su talla y color
+    for (let i = 0; i < selectedSizes.length; i++) {
+      const sz = selectedSizes[i];
+      const c =
+        Array.isArray(selectedColors) && selectedColors[i]
+          ? selectedColors[i]
+          : null;
+      const colorDisp = c
+        ? String(c).startsWith("#")
+          ? `Personalizado (${c})`
+          : colorNames[c] || c
+        : "No especificado";
+      message += `Artículo ${i + 1}: Talla: ${sz} • Color: ${colorDisp}\n`;
+    }
+    const tierText =
+      quantity >= 12 ? "DOCENA" : quantity >= 3 ? "MAYOR" : "DETALLE";
+    message += `Cantidad: ${quantity} un. [${tierText}]\n`;
+    message += `Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
+    message += `Subtotal: RD$${subtotal.toFixed(2)}\n`;
+  } else {
+    message += `Talla: ${selectedSize}\n`;
+    message += `Color: ${colorDisplay}\n`;
+    const tierText =
+      quantity >= 12 ? "DOCENA" : quantity >= 3 ? "MAYOR" : "DETALLE";
+    message += `Cantidad: ${quantity} un. [${tierText}]\n`;
+    message += `Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
+    message += `Subtotal: RD$${subtotal.toFixed(2)}\n`;
+  }
 
   if (savings > 0) {
     message += `Ahorro: RD$${savings.toFixed(2)}\n`;
   }
 
   message += `\nTOTAL: RD$${subtotal.toFixed(2)}\n\n`;
-  message += `Precios mayoristas desde 3 unidades\n`;
+  // Mostrar referencia clara a la docena en el mensaje como pidió el cliente
+  message += `Precios por docena, 12+\n`;
   message += `Envíos a toda República Dominicana\n`;
   message += `https://fabricamayorista.local`;
 
@@ -2716,16 +3523,28 @@ async function buyNowFromModal() {
 function addToCartFromModal() {
   __lastIntent = "add";
   if (!currentProduct) return;
-  if (!validateSelections()) {
+  if (!validateSelections("add")) {
     // activar auto-add cuando el usuario complete selección
     __autoAddAfterValidation = true;
     return;
   }
 
-  const colorKey = isCustomColor ? selectedColorHex : selectedColor;
-  const colorDisplay = isCustomColor
-    ? `Personalizado (${selectedColorHex})`
-    : colorNames[selectedColor] || selectedColor;
+  let colorKey = null;
+  let colorDisplay = "No especificado";
+  if (isCustomColor) {
+    colorKey = selectedColorHex;
+    colorDisplay = `Personalizado (${selectedColorHex})`;
+  } else if (
+    selectedColor &&
+    selectedColor !== "default" &&
+    selectedColor !== "N/A"
+  ) {
+    colorKey = selectedColor;
+    colorDisplay =
+      selectedColor === "original"
+        ? "Original (como en la foto)"
+        : colorNames[selectedColor] || selectedColor;
+  }
   // Sólo usar imagen específica si existe para ese color. Si no existe, guardar null para mostrar swatch en el carrito.
   const imageToUse =
     !isCustomColor &&
@@ -2749,45 +3568,107 @@ function addToCartFromModal() {
         ]
       : null;
 
-  const existing = cart.find(
-    (i) =>
-      i.id === currentProduct.id &&
-      i.colorKey === colorKey &&
-      i.size === selectedSize
-  );
-  let addedItem = null;
-  if (existing) {
-    existing.qty += quantity;
-    addedItem = existing;
+  const displayName = getDisplayName(currentProduct);
+  let addedItems = [];
+
+  if (quantity > 1 && selectedSizes.length === quantity) {
+    // Modo múltiples tallas: agregar cada talla como item separado
+    console.log(`Agregando al carrito - Múltiples tallas:`, selectedSizes);
+    selectedSizes.forEach((size, idx) => {
+      const c =
+        Array.isArray(selectedColors) && selectedColors[idx]
+          ? selectedColors[idx]
+          : null;
+      const perColorKey = c && String(c).startsWith("#") ? c : c;
+      const perColorDisplay = perColorKey
+        ? String(perColorKey).startsWith("#")
+          ? `Personalizado (${perColorKey})`
+          : colorNames[perColorKey] || perColorKey
+        : "No especificado";
+      const perImage =
+        currentProduct.images && currentProduct.images[perColorKey]
+          ? currentProduct.images[perColorKey]
+          : null;
+
+      const existing = cart.find(
+        (i) =>
+          i.id === currentProduct.id &&
+          i.colorKey === perColorKey &&
+          i.size === size
+      );
+
+      if (existing) {
+        existing.qty += 1;
+        addedItems.push(existing);
+      } else {
+        const newItem = {
+          id: currentProduct.id,
+          name: displayName,
+          code: currentProduct.code,
+          category: currentProduct.category || null,
+          basePrice: currentProduct.price,
+          colorKey: perColorKey,
+          colorDisplay: perColorDisplay,
+          colorHex: String(perColorKey).startsWith("#") ? perColorKey : null,
+          size: size,
+          qty: 1,
+          image: perImage,
+          imageOriginal:
+            currentProduct.images && currentProduct.images.default
+              ? currentProduct.images.default
+              : null,
+        };
+        cart.push(newItem);
+        addedItems.push(newItem);
+      }
+    });
   } else {
-    const displayName = getDisplayName(currentProduct);
-    const newItem = {
-      id: currentProduct.id,
-      name: displayName,
-      code: currentProduct.code,
-      category: currentProduct.category || null,
-      basePrice: currentProduct.price,
-      colorKey,
-      colorDisplay,
-      colorHex: selectedColorHex,
-      size: selectedSize,
-      qty: quantity,
-      image: imageToUse,
-      imageOriginal:
-        currentProduct.images && currentProduct.images.default
-          ? currentProduct.images.default
-          : null,
-    };
-    cart.push(newItem);
-    addedItem = newItem;
+    // Modo simple: agregar como antes
+    const existing = cart.find(
+      (i) =>
+        i.id === currentProduct.id &&
+        i.colorKey === colorKey &&
+        i.size === selectedSize
+    );
+
+    if (existing) {
+      existing.qty += quantity;
+      addedItems.push(existing);
+    } else {
+      const newItem = {
+        id: currentProduct.id,
+        name: displayName,
+        code: currentProduct.code,
+        category: currentProduct.category || null,
+        basePrice: currentProduct.price,
+        colorKey,
+        colorDisplay,
+        colorHex: selectedColorHex,
+        size: selectedSize,
+        qty: quantity,
+        image: imageToUse,
+        imageOriginal:
+          currentProduct.images && currentProduct.images.default
+            ? currentProduct.images.default
+            : null,
+      };
+      cart.push(newItem);
+      addedItems.push(newItem);
+    }
   }
 
   renderCart();
   saveCart();
-  // mostrar panel tipo 'añadido a la cesta' con la info del item recién añadido
+
+  // Mostrar panel con información apropiada
   try {
-    if (typeof showAddedPanel === "function" && addedItem)
-      showAddedPanel(addedItem);
+    if (typeof showAddedPanel === "function" && addedItems.length > 0) {
+      const message =
+        quantity > 1
+          ? `${quantity} artículos añadidos al carrito`
+          : `${addedItems[0].name} añadido al carrito`;
+      showAddedPanel(addedItems[0], message);
+    }
   } catch (e) {
     console.warn("showAddedPanel error:", e);
   }
@@ -2814,7 +3695,12 @@ function renderCart() {
   let total = 0;
 
   cart.forEach((item, index) => {
-    const unitPrice = calculatePrice(item.qty, item.basePrice, item.size);
+    const unitPrice = calculatePrice(
+      item.qty,
+      item.basePrice,
+      item.size,
+      item.category
+    );
     const subtotal = unitPrice * item.qty;
     total += subtotal;
 
@@ -2971,6 +3857,16 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       e.stopPropagation();
       closeModal();
+    } else if (e.target.id === "modal-prev") {
+      // Navegar al producto anterior
+      e.preventDefault();
+      e.stopPropagation();
+      navigateModal(-1);
+    } else if (e.target.id === "modal-next") {
+      // Navegar al producto siguiente
+      e.preventDefault();
+      e.stopPropagation();
+      navigateModal(1);
     }
   });
 
@@ -3250,7 +4146,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cart.forEach((i, idx) => {
         const nameForMsg = getDisplayName(i);
-        const unitPrice = calculatePrice(i.qty, i.basePrice, i.size);
+        const unitPrice = calculatePrice(
+          i.qty,
+          i.basePrice,
+          i.size,
+          i.category
+        );
         const subtotal = unitPrice * i.qty;
         const savings = (i.basePrice.retail - unitPrice) * i.qty;
         totalSavings += savings;
@@ -3273,7 +4174,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const total = cart.reduce(
-        (sum, i) => sum + calculatePrice(i.qty, i.basePrice, i.size) * i.qty,
+        (sum, i) =>
+          sum + calculatePrice(i.qty, i.basePrice, i.size, i.category) * i.qty,
         0
       );
 
@@ -3285,7 +4187,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (note) {
         footer += `\n*Nota del cliente:*\n${note}\n`;
       }
-      footer += `\nPrecios mayoristas desde 3 unidades\n`;
+      footer += `\nPrecios por docena, 12+\n`;
       footer += `Envíos a toda República Dominicana\n`;
       footer += `https://fabricamayorista.local`;
 
@@ -3437,6 +4339,8 @@ function buildWhatsAppMessageSingle(
     message += `💵 Subtotal: RD$${subtotal.toFixed(2)}\n`;
     if (savings > 0) message += `✅ Ahorro: RD$${savings.toFixed(2)}\n`;
     message += `\n💎 *TOTAL: RD$${subtotal.toFixed(2)}*\n`;
+    // Indicar docena explícitamente
+    message += `\nPrecios por docena, 12+\n`;
     return message;
   }
 
@@ -3456,6 +4360,8 @@ function buildWhatsAppMessageSingle(
   message += `Subtotal: RD$${subtotal.toFixed(2)}\n`;
   if (savings > 0) message += `Ahorro: RD$${savings.toFixed(2)}\n`;
   message += `\nTOTAL: RD$${subtotal.toFixed(2)}\n`;
+  // Indicar docena explícitamente
+  message += `\nPrecios por docena, 12+\n`;
   return message;
 }
 
@@ -3613,11 +4519,36 @@ function createProductCard(p) {
   div.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
+    // Establecer el contexto del modal según el contexto de render actual
+    // o inferir por rango de id (9..48 => 'crop-tops') para mantener consistencia
+    try {
+      modalOpenContext =
+        currentRenderCategoryContext ||
+        (function () {
+          const n = parseInt(p.id, 10);
+          if (!Number.isNaN(n) && n >= 9 && n <= 48) return "crop-tops";
+          return null;
+        })();
+    } catch (e) {
+      modalOpenContext = currentRenderCategoryContext || null;
+    }
     openModal(p.id);
   });
   div.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
+      // Mantener el mismo comportamiento que en el click: setear modalOpenContext
+      try {
+        modalOpenContext =
+          currentRenderCategoryContext ||
+          (function () {
+            const n = parseInt(p.id, 10);
+            if (!Number.isNaN(n) && n >= 9 && n <= 48) return "crop-tops";
+            return null;
+          })();
+      } catch (e) {
+        modalOpenContext = currentRenderCategoryContext || null;
+      }
       openModal(p.id);
     }
   });

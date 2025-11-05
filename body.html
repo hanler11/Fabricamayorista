@@ -24,10 +24,7 @@
           </div>
           <div class="brand-text">
             <h1>FabricaMayorista</h1>
-            <p>
-              Precios al por mayor a partir de 3 artículos • Descuentos por
-              docena
-            </p>
+            <p>12 de docena a partir de 3 artículos • Descuentos por docena</p>
           </div>
         </a>
 
@@ -235,20 +232,211 @@
       <div class="page-hero-simple">
         <div class="hero-content">
           <h1 class="hero-title">Body</h1>
-          <p class="hero-subtitle">Bodies de dama con precios al por mayor.</p>
+          <p class="hero-subtitle">Bodies de dama con 12 de docena.</p>
           <div class="hero-breadcrumb">
             <a href="index.html">Inicio</a> / <span>Body</span>
           </div>
         </div>
       </div>
 
-      <!-- GRID DE PRODUCTOS (placeholder) -->
+      <!-- GRID DE PRODUCTOS -->
       <div class="products-grid" id="products-grid">
-        <div class="empty-state">
-          Aún no hay productos publicados en esta categoría.
-        </div>
+        <!-- Los productos se cargarán dinámicamente -->
       </div>
     </main>
+
+    <!-- MODAL DE ALERTA CENTRADO -->
+    <div id="alert-modal" class="alert-modal">
+      <div class="alert-content">
+        <h3>¡Atención!</h3>
+        <p id="alert-message">
+          Por favor selecciona el color y la talla antes de continuar.
+        </p>
+        <div id="alert-actions"></div>
+        <button class="alert-btn" onclick="closeAlert()">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- MODAL DE PRODUCTO -->
+    <div id="product-modal" class="modal">
+      <div class="modal-content-professional">
+        <button class="modal-close" id="modal-close">×</button>
+
+        <!-- Lado izquierdo: Imagen y controles -->
+        <div class="modal-left-section">
+          <!-- Imagen del producto -->
+          <div class="main-image-container" id="main-image-container">
+            <img id="modal-img" src="" alt="Producto" class="main-image" />
+          </div>
+          <!-- Navegación entre artículos debajo de la imagen -->
+          <div class="image-nav-buttons">
+            <button
+              id="modal-prev"
+              class="btn-nav-secondary"
+              aria-label="Anterior"
+            >
+              Anterior
+            </button>
+            <button
+              id="modal-next"
+              class="btn-nav-secondary"
+              aria-label="Siguiente"
+            >
+              Siguiente
+            </button>
+          </div>
+
+          <!-- Título y código debajo de la foto -->
+          <div class="left-title-block">
+            <h1 id="modal-name" class="product-title-zara"></h1>
+            <div id="modal-code-display" class="product-code-zara"></div>
+          </div>
+
+          <!-- Controles debajo de la imagen -->
+          <div class="product-controls-left">
+            <!-- Cantidad -->
+            <div class="qty-section-left">
+              <label class="control-label-left">CANTIDAD</label>
+              <div class="qty-controls-left">
+                <button class="qty-btn-left" id="qty-decrease">−</button>
+                <span id="qty-display" class="qty-display-left">1</span>
+                <button class="qty-btn-left" id="qty-increase">+</button>
+              </div>
+              <div class="price-display-left">
+                <span id="current-price-left" class="current-price-left"
+                  >RD$0 c/u</span
+                >
+                <span id="total-price-left" class="total-price-left"
+                  >Total: RD$0</span
+                >
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="actions-left">
+              <button class="btn-add-bag-left" id="add-to-cart-btn">
+                AÑADIR A LA BOLSA
+              </button>
+              <button class="btn-whatsapp-left" id="buy-now-btn">
+                COMPRAR POR WHATSAPP
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lado derecho: Información del producto -->
+        <div class="modal-product-details-zara">
+          <!-- Tabla de precios -->
+          <div class="pricing-tiers-zara">
+            <div class="pricing-title-zara">PRECIOS</div>
+            <div class="tier-row">
+              <span class="qty-text">Precio por unidad</span>
+              <span id="price-retail" class="tier-price">RD$0</span>
+            </div>
+            <div class="tier-row">
+              <span class="qty-text">Precio por docena</span>
+              <span id="price-dozen" class="tier-price">RD$0</span>
+            </div>
+          </div>
+
+          <!-- Selección de color -->
+          <div class="selection-group-zara">
+            <label class="selection-label-zara">COLOR</label>
+            <div class="color-swatches-zara" id="color-swatches"></div>
+            <div class="custom-color-section">
+              <label class="custom-color-label">OTROS COLORES</label>
+              <input
+                type="color"
+                id="custom-color-picker"
+                class="custom-color-zara"
+                title="Seleccionador de color personalizado"
+                aria-label="Seleccionar color personalizado"
+              />
+            </div>
+            <div class="validation-error" id="color-error">
+              Selecciona un color
+            </div>
+          </div>
+
+          <!-- Selección de talla -->
+          <div class="selection-group-zara">
+            <label class="selection-label-zara">TALLA</label>
+            <div id="size-options" class="size-options-zara"></div>
+            <div class="size-note-zara">
+              Tallas XL+ tienen recargo de +RD$50
+            </div>
+            <div class="validation-error" id="size-error">
+              Selecciona una talla
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARRITO SIDEBAR -->
+    <div id="cart-sidebar" class="cart-sidebar">
+      <div class="cart-header">
+        <h2>Tu carrito</h2>
+        <button class="cart-close" id="cart-close">×</button>
+      </div>
+      <div id="cart-items" class="cart-items">
+        <div class="cart-empty">Tu carrito está vacío</div>
+      </div>
+      <div class="cart-footer">
+        <div id="cart-savings" class="cart-savings"></div>
+        <div class="cart-total">
+          <span>Total:</span>
+          <span id="cart-total">RD$0</span>
+        </div>
+        <textarea
+          id="cart-note"
+          class="cart-note"
+          placeholder="Notas adicionales para tu pedido..."
+        ></textarea>
+        <button id="checkout-whatsapp" class="checkout-btn">
+          Finalizar compra por WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- OVERLAY PARA CARRITO -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+
+    <!-- MODAL PARA DATOS DEL CLIENTE -->
+    <div id="customer-name-modal" class="modal" aria-hidden="true">
+      <div class="modal-content-professional">
+        <button class="modal-close" id="customer-name-close">×</button>
+        <div class="customer-name-modal-body">
+          <h3 class="customer-modal-title">Datos del cliente</h3>
+          <p class="customer-name-prompt">
+            Para preparar tu pedido y coordinar la entrega, indícanos tu nombre
+            y ciudad.
+          </p>
+          <input
+            id="customer-name-input"
+            class="customer-name-input"
+            type="text"
+            placeholder="Nombre y apellido"
+            autocomplete="name"
+          />
+          <input
+            id="customer-city-input"
+            class="customer-name-input"
+            type="text"
+            placeholder="Ciudad / Sector"
+            autocomplete="address-level2"
+          />
+          <div class="customer-modal-buttons">
+            <button id="customer-cancel" class="customer-modal-btn-cancel">
+              Cancelar
+            </button>
+            <button id="customer-confirm" class="customer-modal-btn-confirm">
+              Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="site-footer">
@@ -258,7 +446,7 @@
             <a href="index.html" aria-label="Inicio"
               ><img src="Images/logo/logo.png" alt="FabricaMayorista"
             /></a>
-            <p>Fábrica con precios al por mayor.</p>
+            <p>Fábrica con 12 de docena.</p>
           </div>
         </div>
         <div class="footer-col">
@@ -340,6 +528,44 @@
     <!-- Script común -->
     <script src="app.js"></script>
     <script>
+      // Script específico para cargar solo productos de body
+      document.addEventListener("DOMContentLoaded", function () {
+        const grid = document.getElementById("products-grid");
+
+        // Esperar a que products esté disponible
+        const productsArray = window.products || [];
+
+        // Filtrar productos de body (001-008)
+        const bodyProducts = productsArray.filter((product) => {
+          const productId = product.id;
+          return [
+            "001",
+            "002",
+            "003",
+            "004",
+            "005",
+            "006",
+            "007",
+            "008",
+          ].includes(productId);
+        });
+
+        // Limpiar el grid
+        grid.innerHTML = "";
+
+        // Renderizar productos de body
+        bodyProducts.forEach((product) => {
+          const productElement = createProductCard(product);
+          grid.appendChild(productElement);
+        });
+
+        // Si no hay productos, mostrar mensaje
+        if (bodyProducts.length === 0) {
+          grid.innerHTML =
+            '<div class="empty-state">Aún no hay productos publicados en esta categoría.</div>';
+        }
+      });
+
       (function () {
         const toggle = document.getElementById("nav-toggle");
         const overlay = document.getElementById("nav-overlay");
@@ -363,5 +589,6 @@
       })();
     </script>
     <script src="hamburger-menu.js"></script>
+    <script src="zoom-functions.js"></script>
   </body>
 </html>

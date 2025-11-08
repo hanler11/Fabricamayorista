@@ -1681,7 +1681,7 @@ function renderCropTops() {
 // Configurar event listeners del carrito
 function setupCartEventListeners() {
   console.log("setupCartEventListeners() llamada");
-  
+
   // Configurar event listener para el botón de cerrar
   const closeCartBtn = document.getElementById("close-cart");
   console.log("closeCartBtn encontrado:", closeCartBtn);
@@ -1773,7 +1773,7 @@ function configureCartOverlayAndSidebar() {
 // Ensure the shared UI elements (cart sidebar and product modal) exist in the document.
 function ensureSharedUI() {
   console.log("ensureSharedUI() llamada");
-  
+
   // cart-sidebar
   if (!document.getElementById("cart-sidebar")) {
     console.log("Creando cart-sidebar...");
@@ -1806,7 +1806,7 @@ function ensureSharedUI() {
   } else {
     console.log("Cart-sidebar ya existe");
   }
-  
+
   // SIEMPRE configurar event listeners (tanto si se crea como si ya existe)
   setupCartEventListeners();
   configureCartOverlayAndSidebar();
@@ -2182,7 +2182,7 @@ function hideCenterAlert() {
 function toggleCart() {
   // Asegurar que el carrito existe antes de intentar abrirlo
   ensureSharedUI();
-  
+
   const sidebar = document.getElementById("cart-sidebar");
   if (!sidebar) return;
   const opening = !sidebar.classList.contains("active");
@@ -3800,18 +3800,18 @@ function sendWhatsAppOrder(customer) {
 
   const orderId = "FM-" + Date.now().toString().slice(-6);
   let message = `🛍️ NUEVO PEDIDO - ${orderId}\n\n`;
-  
+
   message += `👤 CLIENTE:\n`;
   message += `Nombre: ${customer.name}\n`;
   message += `Ciudad: ${customer.city}\n\n`;
-  
+
   message += `📦 PRODUCTOS:\n`;
-  
+
   let total = 0;
   cart.forEach((item, index) => {
-    message += `${index + 1}. ${item.name || 'Producto'}\n`;
-    message += `   Código: ${item.code || 'N/A'}\n`;
-    message += `   Color: ${item.colorName || item.color || 'Original'}\n`;
+    message += `${index + 1}. ${item.name || "Producto"}\n`;
+    message += `   Código: ${item.code || "N/A"}\n`;
+    message += `   Color: ${item.colorName || item.color || "Original"}\n`;
     message += `   Talla: ${item.size}\n`;
     message += `   Cantidad: ${item.quantity}\n`;
     message += `   Precio: RD$${item.price.toFixed(2)} c/u\n`;
@@ -3829,16 +3829,18 @@ function sendWhatsAppOrder(customer) {
   message += `📞 ¡Gracias por tu pedido!\n`;
   message += `Fabricamayorista.com`;
 
-  const whatsappUrl = `https://wa.me/18093027761?text=${encodeURIComponent(message)}`;
-  
+  const whatsappUrl = `https://wa.me/18093027761?text=${encodeURIComponent(
+    message
+  )}`;
+
   // Limpiar carrito después de enviar
   cart = [];
   saveCart();
   renderCart();
-  
+
   // Abrir WhatsApp
   window.open(whatsappUrl, "_blank");
-  
+
   showCenterAlert("Pedido enviado a WhatsApp exitosamente", "success");
 }
 

@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Carrito</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <h1>Test del Carrito</h1>
-    
+
     <button onclick="testCart()">Crear y Mostrar Carrito</button>
     <button onclick="addTestItem()">Añadir Item de Prueba</button>
-    
+
     <script src="app.js"></script>
-    
+
     <script>
-        function testCart() {
-            console.log("=== TEST CARRITO ===");
-            ensureSharedUI();
-            toggleCart();
-        }
-        
-        function addTestItem() {
-            console.log("=== AÑADIENDO ITEM DE PRUEBA ===");
-            ensureSharedUI();
-            
-            const testItem = {
-                id: "test-001",
-                name: "Producto de Prueba",
-                color: "Rojo", 
-                size: "M",
-                price: 500,
-                quantity: 1,
-                image: "images/001/01.jpg"
-            };
-            
-            addToCart(testItem);
-            toggleCart();
-        }
+      function testCart() {
+        console.log("=== TEST CARRITO ===");
+        ensureSharedUI();
+        toggleCart();
+      }
+
+      function addTestItem() {
+        console.log("=== AÑADIENDO ITEM DE PRUEBA ===");
+        ensureSharedUI();
+
+        const testItem = {
+          id: "test-001",
+          name: "Producto de Prueba",
+          color: "Rojo",
+          size: "M",
+          price: 500,
+          quantity: 1,
+          image: "images/001/01.jpg",
+        };
+
+        addToCart(testItem);
+        toggleCart();
+      }
     </script>
-</body>
+  </body>
 </html>

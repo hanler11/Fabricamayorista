@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guía de Pruebas - Arreglos Detallados</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #667eea;
+      }
+      .test-section {
+        margin-bottom: 30px;
+        padding: 25px;
+        border-radius: 10px;
+        border-left: 5px solid #28a745;
+        background: linear-gradient(to right, #f8fff9, white);
+      }
+      .test-section.urgent {
+        border-left-color: #dc3545;
+        background: linear-gradient(to right, #fff5f5, white);
+      }
+      .step {
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #007bff;
+      }
+      .step-number {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        background: #007bff;
+        color: white;
+        text-align: center;
+        border-radius: 50%;
+        font-weight: bold;
+        margin-right: 10px;
+        line-height: 25px;
+        font-size: 14px;
+      }
+      .expected-result {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .debug-tip {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .test-link {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        margin: 10px 5px;
+        transition: all 0.3s;
+        font-weight: bold;
+      }
+      .test-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+      .emoji {
+        font-size: 1.5em;
+        margin-right: 10px;
+      }
+      .console-tip {
+        background: #1e1e1e;
+        color: #00ff00;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><span class="emoji">🔧</span>Guía de Pruebas Detalladas</h1>
+        <p>Sigue estos pasos exactos para probar cada arreglo</p>
+      </div>
+
+      <div class="test-section urgent">
+        <h2><span class="emoji">❌</span>1. Prueba del Botón X del Carrito</h2>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Abre la consola del navegador:</strong> Presiona F12 y ve a la
+          pestaña "Console"
+          <div class="debug-tip">
+            <strong>💡 Tip:</strong> La consola te mostrará si el event listener
+            se configuró correctamente
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Ve a la página de bodys:</strong>
+          <a href="/body.html" class="test-link">Abrir Bodys</a>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Agrega un producto al carrito:</strong> Haz click en cualquier
+          body y presiona "AGREGAR AL CARRITO"
+        </div>
+
+        <div class="step">
+          <span class="step-number">4</span>
+          <strong>Abre el carrito:</strong> Haz click en el ícono del carrito
+          (esquina superior derecha)
+          <div class="console-tip">
+            Deberías ver en la consola: "Event listener para close-cart
+            configurado"
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">5</span>
+          <strong>Prueba la X:</strong> Haz click en la X (esquina superior
+          derecha del carrito)
+          <div class="expected-result">
+            <strong>✅ Resultado esperado:</strong> El carrito se cierra
+            inmediatamente sin problemas
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>
+          <span class="emoji">💰</span>2. Prueba de Recargos de Tallas XL+
+        </h2>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Abre la consola del navegador</strong> para ver el debugging
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Ve a la página de bodys:</strong>
+          <a href="/body.html" class="test-link">Abrir Bodys</a>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Abre el modal de un producto:</strong> Haz click en cualquier
+          body
+        </div>
+
+        <div class="step">
+          <span class="step-number">4</span>
+          <strong>Selecciona una talla normal:</strong> Haz click en "S" o "M" y
+          nota el precio
+          <div class="console-tip">
+            En la consola verás: "updateModalPrice called with:" y "Calculated
+            price:"
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">5</span>
+          <strong>Selecciona una talla XL:</strong> Haz click en "XL", "2XL" o
+          "3XL"
+          <div class="expected-result">
+            <strong>✅ Resultado esperado:</strong>
+            <br />• El precio unitario sube RD$50 <br />• La tabla de precios se
+            actualiza instantáneamente <br />• El total también refleja el
+            aumento
+          </div>
+          <div class="console-tip">
+            Verás logs como: "Updated left unit price to: RD$XXX c/u"
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2><span class="emoji">📱</span>3. Prueba de Checkout por WhatsApp</h2>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Abre la consola del navegador</strong> (muy importante para
+          este test)
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Agrega productos al carrito:</strong> Agrega al menos 2
+          productos diferentes
+          <a href="/body.html" class="test-link">Bodys</a>
+          <a href="/crop-tops.html" class="test-link">Crop Tops</a>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Abre el carrito:</strong> Haz click en el ícono del carrito
+        </div>
+
+        <div class="step">
+          <span class="step-number">4</span>
+          <strong>Inicia el checkout:</strong> Haz click en "ENVIAR PEDIDO POR
+          WHATSAPP"
+          <div class="console-tip">
+            Deberías ver: "Checkout button clicked" y "Cart has items: X"
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">5</span>
+          <strong>Verifica WhatsApp:</strong> Debería abrirse una nueva pestaña
+          con WhatsApp
+          <div class="expected-result">
+            <strong>✅ Resultado esperado:</strong>
+            <br />• Se abre WhatsApp Web en nueva pestaña <br />• El mensaje
+            está pre-formateado con todos los productos <br />• Incluye precios,
+            cantidades, y total
+          </div>
+          <div class="console-tip">
+            En la consola verás: "Generated WhatsApp message:" y "WhatsApp
+            window opened successfully"
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          background: #e3f2fd;
+          padding: 20px;
+          border-radius: 10px;
+          margin-top: 30px;
+        "
+      >
+        <h3><span class="emoji">🔍</span>Debugging Adicional</h3>
+        <p><strong>Si algún arreglo no funciona:</strong></p>
+        <ol>
+          <li>Revisa la consola del navegador (F12)</li>
+          <li>Busca mensajes de error en rojo</li>
+          <li>Verifica que aparezcan los logs de debugging en verde</li>
+          <li>Asegúrate de que no haya errores JavaScript</li>
+        </ol>
+
+        <h4>Logs importantes a buscar:</h4>
+        <ul>
+          <li>
+            <code>"Event listener para close-cart configurado"</code> - Botón X
+          </li>
+          <li>
+            <code>"updateModalPrice called with:"</code> - Actualización de
+            precios
+          </li>
+          <li><code>"Checkout button clicked"</code> - Inicio de checkout</li>
+          <li>
+            <code>"WhatsApp window opened successfully"</code> - WhatsApp
+            funcionando
+          </li>
+        </ul>
+      </div>
+
+      <div style="text-align: center; margin-top: 30px">
+        <a href="/index.html" class="test-link">🏠 Volver al Inicio</a>
+        <a href="/test-arreglos.html" class="test-link"
+          >📋 Resumen de Arreglos</a
+        >
+      </div>
+    </div>
+  </body>
+</html>

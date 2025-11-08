@@ -506,8 +506,51 @@ function hexToColorName(hex) {
   return "Color Personalizado";
 }
 
+// Función para mostrar alertas centrales más visibles
+function showCenterAlert(message, type = "warning") {
+  // Crear elemento de alerta central si no existe
+  let centerAlert = document.getElementById("center-alert");
+  if (!centerAlert) {
+    centerAlert = document.createElement("div");
+    centerAlert.id = "center-alert";
+    centerAlert.className = "center-alert";
+    document.body.appendChild(centerAlert);
+  }
+
+  // Configurar el mensaje y tipo
+  centerAlert.textContent = message;
+  centerAlert.className = `center-alert ${type}`;
+  centerAlert.style.display = "block";
+
+  // Auto-ocultar después de 3 segundos
+  setTimeout(() => {
+    if (centerAlert) {
+      centerAlert.style.display = "none";
+    }
+  }, 3000);
+}
+
 function addToCartFromModal() {
   if (!currentProduct) return;
+
+  // Validar que se hayan seleccionado talla y color
+  if (!selectedSize) {
+    const sizeError = document.getElementById("size-error");
+    if (sizeError) sizeError.style.display = "block";
+    showCenterAlert("Por favor selecciona una talla", "warning");
+    return;
+  }
+
+  if (
+    !selectedColor ||
+    selectedColor === "default" ||
+    selectedColor === "N/A"
+  ) {
+    const colorError = document.getElementById("color-error");
+    if (colorError) colorError.style.display = "block";
+    showCenterAlert("Por favor selecciona un color", "warning");
+    return;
+  }
 
   const item = {
     id: currentProduct.id,

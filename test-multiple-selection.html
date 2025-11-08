@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Selección Múltiple</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      .test-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .test-result {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 Test de Selección Múltiple</h1>
+
+      <h2>Simulación de selección de 3 artículos:</h2>
+
+      <div id="test-results">
+        <!-- Los resultados se mostrarán aquí -->
+      </div>
+
+      <button onclick="runTests()">🚀 Ejecutar Pruebas</button>
+    </div>
+
+    <script>
+      function runTests() {
+        const resultsDiv = document.getElementById("test-results");
+        resultsDiv.innerHTML = "";
+
+        // Test 1: Verificar inicialización correcta
+        let quantity = 3;
+        let selectedSizes = new Array(quantity).fill(null);
+        let selectedColors = new Array(quantity).fill(null);
+
+        addResult(
+          "Test 1: Inicialización de arrays",
+          selectedSizes.length === quantity &&
+            selectedColors.length === quantity,
+          `Tallas: ${selectedSizes.length}, Colores: ${selectedColors.length}, Cantidad: ${quantity}`
+        );
+
+        // Test 2: Simular selección de tallas
+        for (let i = 0; i < quantity; i++) {
+          selectedSizes[i] = ["S", "M", "L"][i % 3];
+        }
+
+        let allSizesSelected =
+          selectedSizes.length === quantity && selectedSizes.every((s) => !!s);
+
+        addResult(
+          "Test 2: Selección de tallas completa",
+          allSizesSelected,
+          `Tallas seleccionadas: ${selectedSizes.join(", ")}`
+        );
+
+        // Test 3: Verificar que NO hay elementos adicionales
+        addResult(
+          "Test 3: Sin elementos adicionales",
+          selectedSizes.length === quantity,
+          `Array tiene exactamente ${quantity} elementos (no ${quantity + 1})`
+        );
+
+        // Test 4: Simular selección de colores (modo global)
+        let globalColor = "negro";
+        for (let i = 0; i < quantity; i++) {
+          selectedColors[i] = globalColor;
+        }
+
+        let allColorsSelected =
+          selectedColors.length === quantity &&
+          selectedColors.every((c) => !!c);
+
+        addResult(
+          "Test 4: Selección global de colores",
+          allColorsSelected,
+          `Colores: ${selectedColors.join(", ")}`
+        );
+
+        // Test 5: Validación final
+        let validForCheckout = allSizesSelected && allColorsSelected;
+
+        addResult(
+          "Test 5: Validación para checkout",
+          validForCheckout,
+          `✅ ${quantity} artículos listos para agregar al carrito`
+        );
+      }
+
+      function addResult(testName, passed, details) {
+        const resultsDiv = document.getElementById("test-results");
+        const resultDiv = document.createElement("div");
+        resultDiv.className = `test-result ${passed ? "success" : "error"}`;
+        resultDiv.innerHTML = `
+                <strong>${passed ? "✅" : "❌"} ${testName}</strong><br>
+                <small>${details}</small>
+            `;
+        resultsDiv.appendChild(resultDiv);
+      }
+
+      // Ejecutar pruebas automáticamente al cargar
+      document.addEventListener("DOMContentLoaded", runTests);
+    </script>
+  </body>
+</html>

@@ -1708,6 +1708,15 @@ function ensureSharedUI() {
       </aside>`;
     document.body.insertAdjacentHTML("beforeend", cartHtml);
 
+    // Configurar event listener para el botón de cerrar DESPUÉS de crear el HTML
+    const closeCartBtn = document.getElementById("close-cart");
+    if (closeCartBtn) {
+      closeCartBtn.addEventListener("click", closeCart);
+      console.log("Event listener para close-cart configurado");
+    } else {
+      console.error("No se encontró el botón close-cart");
+    }
+
     // Cerrar carrito al click del overlay
     const overlay = document.getElementById("cart-overlay");
     if (overlay && !overlay.dataset.bound) {
@@ -2131,52 +2140,52 @@ function closeCart() {
 function onDocClickForCart(e) {
   const sidebar = document.getElementById("cart-sidebar");
   if (!sidebar || !sidebar.classList.contains("active")) return;
+
   // Guard: ignore clicks that happen immediately after opening (likely the opener click)
   const openedAt = parseInt(sidebar.dataset._openedAt || "0", 10);
   if (openedAt && Date.now() - openedAt < 180) return;
 
-  // if click is outside the sidebar and not the cart toggle buttons or header button, close
-  const cartIcon = document.querySelector(".cart-icon-btn");
-  const headerBtn = document.querySelector(".header-cart-btn");
   const clickedInside = sidebar.contains(e.target);
-  // Si el clic es en controles internos (botones de cantidad, eliminar), nunca cerrar
+
+  // Si el clic es dentro del carrito, NUNCA cerrar (excepto en el botón X que tiene su propio handler)
   if (clickedInside) {
-    const isQtyBtn = e.target.closest && e.target.closest(".qty-btn-cart");
-    const isRemove =
-      e.target.closest && e.target.closest(".cart-remove-professional");
-    if (isQtyBtn || isRemove) return; // no cerrar
+    return; // Simplificado: cualquier clic dentro del carrito no lo cierra
   }
+
+  // Solo cerrar si es clic fuera del carrito o en el overlay
   const overlay = document.getElementById("cart-overlay");
   const clickedOverlay = overlay && e.target === overlay;
+
+  // Verificar si no es el botón que abre el carrito
+  const cartIcon = document.querySelector(".cart-icon-btn");
+  const headerBtn = document.querySelector(".header-cart-btn");
   const clickedCartIcon =
     cartIcon && (e.target === cartIcon || cartIcon.contains(e.target));
   const clickedHeaderBtn =
     headerBtn && (e.target === headerBtn || headerBtn.contains(e.target));
+
   if (
     (!clickedInside && !clickedCartIcon && !clickedHeaderBtn) ||
     clickedOverlay
-  )
+  ) {
     closeCart();
+  }
 }
 
 function onEscForCart(e) {
   if (e.key === "Escape") closeCart();
 }
 
-function onScrollForCart() {
-  closeCart();
-}
-
 function attachCartCloseListeners() {
   document.addEventListener("click", onDocClickForCart);
   document.addEventListener("keydown", onEscForCart);
-  window.addEventListener("scroll", onScrollForCart, { passive: true });
+  // Removido: window.addEventListener("scroll", onScrollForCart, { passive: true });
 }
 
 function detachCartCloseListeners() {
   document.removeEventListener("click", onDocClickForCart);
   document.removeEventListener("keydown", onEscForCart);
-  window.removeEventListener("scroll", onScrollForCart);
+  // Removido: window.removeEventListener("scroll", onScrollForCart);
 }
 
 // Persistence helpers
@@ -2553,6 +2562,17 @@ function navigateModal(delta) {
     quantity = 1;
     currentIndexInGlobal = nextIndex;
 
+    // Resetear estado de múltiples artículos
+    selectedSizes = [];
+    selectedColors = [];
+    multipleMode = false;
+
+    // Si la cantidad es mayor a 1, inicializar arrays para la nueva cantidad
+    if (quantity > 1) {
+      selectedSizes = new Array(quantity).fill(null);
+      selectedColors = new Array(quantity).fill(null);
+    }
+
     // Re-renderizar contenido del modal sin cerrarlo
     const nameEl = document.getElementById("modal-name");
     const imgEl = document.getElementById("modal-img");
@@ -2671,9 +2691,9 @@ function navigateModal(delta) {
         selectColor("Personalizado", true, e.target.value);
     }
 
-    // Tallas
+    // Tallas - solo crear botones simples si NO es múltiple
     const sizeDiv = document.getElementById("size-options");
-    if (sizeDiv) {
+    if (sizeDiv && quantity === 1) {
       sizeDiv.innerHTML = "";
       currentProduct.sizes.forEach((size) => {
         const btn = document.createElement("button");
@@ -2687,6 +2707,16 @@ function navigateModal(delta) {
 
     // Actualizar precio principal
     updateModalPrice();
+
+    // Si hay múltiples artículos, limpiar y mostrar selectores individuales
+    if (quantity > 1) {
+      // Limpiar contenedor antes de recrear
+      const sizeDiv = document.getElementById("size-options");
+      if (sizeDiv) {
+        sizeDiv.innerHTML = "";
+      }
+      showMultipleSizeMessage();
+    }
 
     // Zoom deshabilitado
   } catch (e) {
@@ -2860,10 +2890,14 @@ function selectColor(color, custom = false, hexValue = null) {
     }
   } catch (e) {}
 
-  // cerrar carrito al cambiar opción
-  try {
-    closeCart();
-  } catch (e) {}
+  // cerrar carrito al cambiar opción (solo si no estamos en el carrito)
+  const cartSidebar = document.getElementById("cart-sidebar");
+  const isCartOpen = cartSidebar && cartSidebar.classList.contains("active");
+  if (!isCartOpen) {
+    try {
+      closeCart();
+    } catch (e) {}
+  }
 }
 
 function selectSize(size, btnEl) {
@@ -2878,10 +2912,14 @@ function selectSize(size, btnEl) {
     .forEach((s) => s.classList.remove("active"));
   if (btnEl) btnEl.classList.add("active");
 
-  // cerrar carrito al cambiar talla
-  try {
-    closeCart();
-  } catch (e) {}
+  // cerrar carrito al cambiar talla (solo si no estamos en el carrito)
+  const cartSidebar = document.getElementById("cart-sidebar");
+  const isCartOpen = cartSidebar && cartSidebar.classList.contains("active");
+  if (!isCartOpen) {
+    try {
+      closeCart();
+    } catch (e) {}
+  }
 
   // Recalcular precio inmediatamente para aplicar +RD$50 a XL+
   try {
@@ -2922,7 +2960,13 @@ function changeQty(delta) {
   quantity = Math.max(1, quantity + delta);
   const qtyEl = document.getElementById("qty-display");
   if (qtyEl) qtyEl.textContent = quantity;
-  updateModalPrice();
+
+  // Usar la función de precio correcta según el contexto
+  if (quantity > 1) {
+    updateMultipleModalPrice();
+  } else {
+    updateModalPrice();
+  }
 
   // Mostrar mensaje para múltiples artículos
   showMultipleSizeMessage();
@@ -2942,22 +2986,35 @@ function showMultipleSizeMessage() {
       sizeLabel.textContent = `TALLAS (${quantity} artículos)`;
     }
 
-    // Inicializar array de tallas si no existe
-    if (selectedSizes.length !== quantity) {
-      selectedSizes = new Array(quantity).fill(
-        selectedSize || currentProduct.sizes[0]
-      );
+    // Solo inicializar arrays si están vacíos o si la cantidad cambió significativamente
+    // No resetear si ya hay selecciones
+    if (selectedSizes.length === 0) {
+      selectedSizes = new Array(quantity).fill(null);
+    } else if (selectedSizes.length < quantity) {
+      // Solo agregar elementos nuevos
+      while (selectedSizes.length < quantity) {
+        selectedSizes.push(null);
+      }
+    } else if (selectedSizes.length > quantity) {
+      // Solo remover elementos extras
+      selectedSizes = selectedSizes.slice(0, quantity);
     }
-    // Inicializar array de colores por artículo si no existe
-    if (selectedColors.length !== quantity) {
+
+    if (selectedColors.length === 0) {
       selectedColors = new Array(quantity).fill(null);
+    } else if (selectedColors.length < quantity) {
+      while (selectedColors.length < quantity) {
+        selectedColors.push(null);
+      }
+    } else if (selectedColors.length > quantity) {
+      selectedColors = selectedColors.slice(0, quantity);
     }
 
     // Limpiar y recrear los selectores
     sizeOptionsContainer.innerHTML = "";
     sizeOptionsContainer.className = "size-options-zara multiple-selectors";
 
-    // Crear selector para cada artículo
+    // Crear selector individual para cada artículo (sin modo global)
     for (let i = 0; i < quantity; i++) {
       const selectorGroup = document.createElement("div");
       selectorGroup.className = "size-selector-group";
@@ -2967,6 +3024,7 @@ function showMultipleSizeMessage() {
       label.textContent = `Artículo ${i + 1}:`;
       selectorGroup.appendChild(label);
 
+      // Botones de talla
       const buttonsRow = document.createElement("div");
       buttonsRow.className = "size-buttons-row";
 
@@ -2989,7 +3047,8 @@ function showMultipleSizeMessage() {
       });
 
       selectorGroup.appendChild(buttonsRow);
-      // --- Color selector por artículo ---
+
+      // Selector de colores individual para cada artículo
       const colorRow = document.createElement("div");
       colorRow.className = "color-buttons-row";
 
@@ -3002,8 +3061,7 @@ function showMultipleSizeMessage() {
         e.preventDefault();
         selectedColors[i] = "original";
         // marcar activo en este grupo
-        const group = selectorGroup;
-        group
+        selectorGroup
           .querySelectorAll(".swatch")
           .forEach((s) => s.classList.remove("active"));
         orig.classList.add("active");
@@ -3012,30 +3070,31 @@ function showMultipleSizeMessage() {
         if (colorError) colorError.style.display = "none";
         checkAutoAddForMultiple();
       });
+
       // marcar si ya estaba seleccionado
       if (selectedColors[i] === "original") orig.classList.add("active");
       colorRow.appendChild(orig);
 
-      // Determinar colores disponibles por producto (si está definido) o usar el mapa global
-      const availableColors =
-        Array.isArray(currentProduct.colors) && currentProduct.colors.length
-          ? currentProduct.colors
-          : Object.keys(colorMap);
+      // Determinar colores disponibles - usar todos los colores del mapa
+      const availableColors = Object.keys(colorMap);
+
       availableColors.forEach((key) => {
         const hex =
           colorMap[key] || (key && String(key).startsWith("#") ? key : null);
         const btn = document.createElement("button");
         btn.className = "swatch swatch-small";
         btn.dataset.color = key;
-        if (hex) btn.style.background = hex;
+        if (hex) {
+          btn.style.backgroundColor = hex;
+          btn.style.border = "2px solid #ddd";
+        }
         btn.title = colorNames[key] || key;
         btn.type = "button";
         btn.addEventListener("click", (e) => {
           e.preventDefault();
           selectedColors[i] = key;
           // marcar activo solo en este grupo
-          const group = selectorGroup;
-          group
+          selectorGroup
             .querySelectorAll(".swatch")
             .forEach((s) => s.classList.remove("active"));
           btn.classList.add("active");
@@ -3043,6 +3102,7 @@ function showMultipleSizeMessage() {
           if (colorError) colorError.style.display = "none";
           checkAutoAddForMultiple();
         });
+
         // marcar activo si ya se seleccionó antes
         if (selectedColors[i] && selectedColors[i] === key) {
           btn.classList.add("active");
@@ -3057,8 +3117,7 @@ function showMultipleSizeMessage() {
       custom.addEventListener("change", (e) => {
         selectedColors[i] = e.target.value;
         // desactivar otras swatches en este grupo
-        const group = selectorGroup;
-        group
+        selectorGroup
           .querySelectorAll(".swatch")
           .forEach((s) => s.classList.remove("active"));
         if (colorRow && colorRow.contains(custom))
@@ -3078,7 +3137,7 @@ function showMultipleSizeMessage() {
     infoMessage.className = "multiple-size-info";
     infoMessage.innerHTML = `
       <span class="info-icon">💡</span>
-      <span class="info-text">Selecciona una talla diferente para cada artículo</span>
+      <span class="info-text">Selecciona talla y color para cada artículo</span>
     `;
     sizeOptionsContainer.appendChild(infoMessage);
   } else {
@@ -3088,27 +3147,27 @@ function showMultipleSizeMessage() {
     }
 
     selectedSizes = []; // Limpiar array
+    selectedColors = []; // Limpiar array
     sizeOptionsContainer.innerHTML = "";
     sizeOptionsContainer.className = "size-options-zara";
 
     // Recrear botones simples
-    currentProduct.sizes.forEach((size) => {
-      const btn = document.createElement("button");
-      btn.className = "size-btn";
-      btn.textContent = size;
-      btn.type = "button";
+    if (currentProduct && currentProduct.sizes) {
+      currentProduct.sizes.forEach((size) => {
+        const btn = document.createElement("button");
+        btn.className = "size-btn";
+        btn.textContent = size;
+        btn.type = "button";
 
-      if (size === selectedSize) {
-        btn.classList.add("active");
-      }
+        if (size === selectedSize) {
+          btn.classList.add("active");
+        }
 
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        selectSize(size, btn);
+        btn.addEventListener("click", () => selectSize(size, btn));
+
+        sizeOptionsContainer.appendChild(btn);
       });
-
-      sizeOptionsContainer.appendChild(btn);
-    });
+    }
   }
 }
 
@@ -3132,6 +3191,9 @@ function selectMultipleSize(size, index) {
       selectedBtn.classList.add("active");
     }
   }
+
+  // Para múltiples artículos, actualizar el precio total considerando todas las tallas
+  updateMultipleModalPrice();
 
   // Limpiar errores de validación
   const sizeError = document.getElementById("size-error");
@@ -3165,14 +3227,21 @@ function selectMultipleSize(size, index) {
 function checkAutoAddForMultiple() {
   try {
     if (!__autoAddAfterValidation) return;
+
+    // Verificar que todas las tallas estén seleccionadas
     const allSizesSelected =
       Array.isArray(selectedSizes) &&
       selectedSizes.length === quantity &&
       selectedSizes.every((s) => !!s);
+
+    // Verificar que todos los colores estén seleccionados - OBLIGATORIO para TODOS
     const allColorsSelected =
       Array.isArray(selectedColors) &&
       selectedColors.length === quantity &&
-      selectedColors.every((c) => !!c && c !== "default" && c !== "N/A");
+      selectedColors.every(
+        (c) => c && c !== "default" && c !== "N/A" && c !== null
+      );
+
     if (allSizesSelected && allColorsSelected) {
       const intent = __lastIntent || "add";
       __autoAddAfterValidation = false;
@@ -3189,18 +3258,34 @@ function checkAutoAddForMultiple() {
 
 function updateModalPrice() {
   if (!currentProduct) return;
+
+  console.log("updateModalPrice called with:", {
+    quantity,
+    selectedSize,
+    category: currentProduct.category,
+  });
+
   const unit = calculatePrice(
     quantity,
     currentProduct.price,
     selectedSize,
     currentProduct && currentProduct.category
   );
+
+  console.log("Calculated price:", unit, "for size:", selectedSize);
+
   // Actualizar panel de la izquierda (debajo de la imagen)
   const leftUnitEl = document.getElementById("current-price-left");
   const leftTotalEl = document.getElementById("total-price-left");
 
   // Reflejar precio/total en el bloque izquierdo del modal
-  if (leftUnitEl) leftUnitEl.textContent = `RD$${unit} c/u`;
+  if (leftUnitEl) {
+    leftUnitEl.textContent = `RD$${unit} c/u`;
+    console.log("Updated left unit price to:", `RD$${unit} c/u`);
+  } else {
+    console.warn("current-price-left element not found");
+  }
+
   if (leftTotalEl) {
     const total = (unit * quantity).toFixed(2);
     const retailPrice = currentProduct.price.retail;
@@ -3210,6 +3295,39 @@ function updateModalPrice() {
       text += ` (Ahorras RD$${savings.toFixed(2)})`;
     }
     leftTotalEl.textContent = text;
+    console.log("Updated total price to:", text);
+  } else {
+    console.warn("total-price-left element not found");
+  }
+
+  // Actualizar precios en la tabla considerando el recargo de talla
+  const retailEl = document.getElementById("price-retail");
+  const dozenEl = document.getElementById("price-dozen");
+
+  if (retailEl) {
+    const retailPrice = calculatePrice(
+      1,
+      currentProduct.price,
+      selectedSize,
+      currentProduct.category
+    );
+    retailEl.textContent = `RD$${retailPrice}`;
+    console.log("Updated table retail price to:", `RD$${retailPrice}`);
+  } else {
+    console.warn("price-retail element not found");
+  }
+
+  if (dozenEl) {
+    const dozenPrice = calculatePrice(
+      12,
+      currentProduct.price,
+      selectedSize,
+      currentProduct.category
+    );
+    dozenEl.textContent = `RD$${dozenPrice}`;
+    console.log("Updated table dozen price to:", `RD$${dozenPrice}`);
+  } else {
+    console.warn("price-dozen element not found");
   }
 
   // Marcar la fila activa en la tabla de precios (retail / wholesale / dozen)
@@ -3238,6 +3356,95 @@ function updateModalPrice() {
     }
   } catch (e) {
     // noop
+  }
+}
+
+// Función para actualizar precios con múltiples artículos
+function updateMultipleModalPrice() {
+  if (!currentProduct || quantity <= 1) {
+    // Si no es múltiple, usar la función normal
+    updateModalPrice();
+    return;
+  }
+
+  // Calcular precio total considerando cada talla individual
+  let totalPrice = 0;
+  let basePrice = currentProduct.price.retail;
+
+  for (let i = 0; i < quantity; i++) {
+    const size = selectedSizes[i];
+    if (size) {
+      const unitPrice = calculatePrice(
+        1, // Siempre 1 para precio unitario
+        currentProduct.price,
+        size,
+        currentProduct.category
+      );
+      totalPrice += unitPrice;
+    } else {
+      // Si no hay talla, usar el precio base
+      totalPrice += basePrice;
+    }
+  }
+
+  console.log(
+    "Multiple items total price:",
+    totalPrice,
+    "for sizes:",
+    selectedSizes
+  );
+
+  // Actualizar panel de la izquierda - mostrar precio base y total real
+  const leftUnitEl = document.getElementById("current-price-left");
+  const leftTotalEl = document.getElementById("total-price-left");
+
+  if (leftUnitEl) {
+    leftUnitEl.textContent = `RD$${basePrice} c/u base`;
+    console.log("Updated left unit price to base:", `RD$${basePrice}`);
+  }
+
+  if (leftTotalEl) {
+    const baseTotalPrice = basePrice * quantity;
+    const extraCharges = totalPrice - baseTotalPrice;
+    let text = `Total: RD$${totalPrice.toFixed(2)}`;
+    if (extraCharges > 0) {
+      text += ` (+RD$${extraCharges.toFixed(2)} por tallas XL+)`;
+    }
+    leftTotalEl.textContent = text;
+    console.log("Updated multiple total price to:", text);
+  }
+
+  // Para la tabla de precios, mantener los precios base
+  const retailEl = document.getElementById("price-retail");
+  const dozenEl = document.getElementById("price-dozen");
+
+  if (retailEl) {
+    retailEl.textContent = `RD$${basePrice}`;
+  }
+
+  if (dozenEl) {
+    const dozenPrice = calculatePrice(
+      12,
+      currentProduct.price,
+      null,
+      currentProduct.category
+    );
+    dozenEl.textContent = `RD$${dozenPrice}`;
+  }
+
+  // Mostrar desglose individual en consola para debugging
+  console.log("Price breakdown:");
+  for (let i = 0; i < quantity; i++) {
+    const size = selectedSizes[i] || "No seleccionada";
+    const unitPrice = selectedSizes[i]
+      ? calculatePrice(
+          1,
+          currentProduct.price,
+          selectedSizes[i],
+          currentProduct.category
+        )
+      : basePrice;
+    console.log(`Artículo ${i + 1}: ${size} = RD$${unitPrice}`);
   }
 }
 
@@ -3282,107 +3489,100 @@ function closeAlert() {
   }
 }
 
+// Función para mostrar alertas centrales más visibles
+function showCenterAlert(message, type = "warning") {
+  // Crear elemento de alerta central si no existe
+  let centerAlert = document.getElementById("center-alert");
+  if (!centerAlert) {
+    centerAlert = document.createElement("div");
+    centerAlert.id = "center-alert";
+    centerAlert.className = "center-alert";
+    document.body.appendChild(centerAlert);
+  }
+
+  // Configurar el mensaje y tipo
+  centerAlert.textContent = message;
+  centerAlert.className = `center-alert ${type}`;
+  centerAlert.style.display = "block";
+
+  // Auto-ocultar después de 3 segundos
+  setTimeout(() => {
+    if (centerAlert) {
+      centerAlert.style.display = "none";
+    }
+  }, 3000);
+}
+
 // Validar selecciones obligatorias con modal centrado
 function validateSelections(action = "add") {
   let isValid = true;
 
-  // NOTA: El color ahora es opcional por petición del cliente.
-  // Validamos únicamente la(s) talla(s) (si falta talla, bloquear la acción).
+  // Validar tallas - OBLIGATORIO para todos los productos
   const sizeError = document.getElementById("size-error");
   let missingSize = false;
 
   if (quantity > 1) {
+    // Para múltiples artículos, verificar que tenemos exactamente la cantidad de tallas
     missingSize =
       selectedSizes.length !== quantity ||
       selectedSizes.some(
         (size) => !size || size === null || size === undefined
       );
   } else {
+    // Para un solo artículo, verificar que hay talla seleccionada
     missingSize =
       !selectedSize || selectedSize === null || selectedSize === undefined;
   }
 
   if (missingSize) {
     if (sizeError) sizeError.style.display = "block";
-    isValid = false;
-  } else if (sizeError) sizeError.style.display = "none";
-
-  if (missingSize) {
-    const sizeButtons = Array.from(
-      document.querySelectorAll("#size-options .size-btn")
+    showCenterAlert(
+      "Por favor selecciona la talla para todos los artículos",
+      "warning"
     );
-    const actions = sizeButtons.map((btn) => {
-      const s = btn.textContent?.trim();
-      return { label: s, action: () => btn.click() };
-    });
-    showAlert("Selecciona tu talla", actions);
     return false;
+  } else if (sizeError) {
+    sizeError.style.display = "none";
   }
 
-  // Validar selección de color - OBLIGATORIO para bodys (001-008)
-  const isBodyProduct =
-    currentProduct &&
-    currentProduct.id &&
-    parseInt(currentProduct.id, 10) >= 1 &&
-    parseInt(currentProduct.id, 10) <= 8;
+  // Validar colores - OBLIGATORIO para TODOS los productos
+  const colorError = document.getElementById("color-error");
 
-  if (isBodyProduct) {
-    // Para bodys, el color es SIEMPRE obligatorio
-    const colorError = document.getElementById("color-error");
+  if (quantity > 1) {
+    // Para múltiples artículos, verificar que todos tengan color seleccionado
+    const missingColors =
+      selectedColors.length !== quantity ||
+      selectedColors.some((c) => !c || c === null || c === undefined);
+
+    if (missingColors) {
+      if (colorError) colorError.style.display = "block";
+      showCenterAlert(
+        "Por favor selecciona el color para todos los artículos",
+        "warning"
+      );
+      return false;
+    }
+  } else {
+    // Para un solo artículo, verificar color
     const hasColor =
       isCustomColor ||
-      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
+      (selectedColor &&
+        selectedColor !== "default" &&
+        selectedColor !== "N/A" &&
+        selectedColor !== null);
 
     if (!hasColor) {
       if (colorError) colorError.style.display = "block";
-      const actions = [
-        {
-          label: "Elegir color",
-          action: () => {
-            const el = document.getElementById("color-swatches");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-          },
-        },
-      ];
-      showAlert("Por favor selecciona un color antes de continuar", actions);
+      showCenterAlert(
+        "Por favor selecciona un color para el artículo",
+        "warning"
+      );
       return false;
-    } else {
-      if (colorError) colorError.style.display = "none";
     }
-  } else if (
-    // Para otros productos, requerir color solo en múltiples artículos de crop-tops
-    quantity > 1 &&
-    String(action || "").toLowerCase() === "add" &&
-    modalOpenContext === "crop-tops"
-  ) {
-    const colorError = document.getElementById("color-error");
-    const missingColor =
-      !Array.isArray(selectedColors) ||
-      selectedColors.length !== quantity ||
-      selectedColors.some((c) => !c || c === "default" || c === "N/A");
-    if (missingColor) {
-      if (colorError) colorError.style.display = "block";
-      const actions = [
-        {
-          label: "Elegir color",
-          action: () => {
-            const el = document.getElementById("size-options");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-          },
-        },
-      ];
-      showAlert("Selecciona un color para cada artículo", actions);
-      return false;
-    } else {
-      if (colorError) colorError.style.display = "none";
-    }
-  } else {
-    // En los demás casos, asegurarnos de ocultar cualquier mensaje de color
-    const colorError = document.getElementById("color-error");
-    if (colorError) colorError.style.display = "none";
   }
 
-  return isValid;
+  if (colorError) colorError.style.display = "none";
+  return true;
 }
 
 // Compra directa por WhatsApp
@@ -3840,11 +4040,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Connect cart buttons
   const cartBtn = document.getElementById("cart-open");
   const fabCart = document.getElementById("fab-cart");
-  const closeCart = document.getElementById("close-cart");
+  // Nota: close-cart se configura cuando se crea el carrito dinámicamente
 
   if (cartBtn) cartBtn.addEventListener("click", toggleCart);
   if (fabCart) fabCart.addEventListener("click", toggleCart);
-  if (closeCart) closeCart.addEventListener("click", toggleCart);
 
   // Connect modal buttons (will be created dynamically)
   document.addEventListener("click", (e) => {
@@ -4105,102 +4304,131 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkoutBtn = document.getElementById("checkoutBtn");
   if (checkoutBtn) {
     checkoutBtn.addEventListener("click", async () => {
+      console.log("Checkout button clicked");
+
       if (cart.length === 0) {
         alert("Carrito vacío");
         return;
       }
 
+      console.log("Cart has items:", cart.length);
+
       // Cerrar el carrito para que el formulario no quede tapado
       try {
         closeCart();
-      } catch (e) {}
-
-      const customer = await collectCustomerInfo();
-      if (customer === null) return; // cancelado
-
-      const note = document.getElementById("note")
-        ? document.getElementById("note").value.trim()
-        : "";
-      const orderId = generateOrderId();
-      const now = new Date();
-      const dateStr = now.toLocaleString();
-
-      let header = `FabricaMayorista\n`;
-      try {
-        const hasDanza = cart.some(
-          (i) =>
-            i &&
-            (i.category === "danza" ||
-              products.find((p) => p.code === i.code)?.category === "danza")
-        );
-        if (hasDanza) header += `Sección: Danza\n`;
-      } catch (e) {}
-      header += `Pedido: ${orderId}\n`;
-      header += `Fecha: ${dateStr}\n`;
-      if (customer.name) header += `Cliente: ${customer.name}\n`;
-      if (customer.city) header += `Ciudad: ${customer.city}\n`;
-      header += `------------------------------\n\n`;
-
-      let body = "";
-      let totalSavings = 0;
-
-      cart.forEach((i, idx) => {
-        const nameForMsg = getDisplayName(i);
-        const unitPrice = calculatePrice(
-          i.qty,
-          i.basePrice,
-          i.size,
-          i.category
-        );
-        const subtotal = unitPrice * i.qty;
-        const savings = (i.basePrice.retail - unitPrice) * i.qty;
-        totalSavings += savings;
-
-        // Determinar tier y emoji
-        const tierBadge =
-          i.qty >= 12 ? "DOCENA" : i.qty >= 3 ? "MAYOR" : "DETALLE";
-
-        body += `*${idx + 1}) ${nameForMsg}*\n`;
-        body += `   Código: ${i.code}\n`;
-        body += `   Talla: ${i.size}\n`;
-        body += `   Color: ${i.colorDisplay || i.colorKey}\n`;
-        body += `   Cantidad: ${i.qty} un. [${tierBadge}]\n`;
-        body += `   Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
-        body += `   Subtotal: RD$${subtotal.toFixed(2)}\n`;
-        if (savings > 0) {
-          body += `   Ahorro: RD$${savings.toFixed(2)}\n`;
-        }
-        body += `\n------------------------------\n`;
-      });
-
-      const total = cart.reduce(
-        (sum, i) =>
-          sum + calculatePrice(i.qty, i.basePrice, i.size, i.category) * i.qty,
-        0
-      );
-
-      let footer = `\n*RESUMEN DEL PEDIDO*\n`;
-      footer += `Total: *RD$${total.toFixed(2)}*\n`;
-      if (totalSavings > 0) {
-        footer += `Ahorro total: *RD$${totalSavings.toFixed(2)}*\n`;
-      }
-      if (note) {
-        footer += `\n*Nota del cliente:*\n${note}\n`;
-      }
-      footer += `\nPrecios por docena, 12+\n`;
-      footer += `Envíos a toda República Dominicana\n`;
-      footer += `https://fabricamayorista.local`;
-
-      const msg = header + body + footer;
-
-      // Abrir WhatsApp con texto solamente. Se abre una ventana nueva para evitar bloqueos.
-      const outWin = window.open("", "_blank");
-      const wa = `https://wa.me/18093027761?text=${encodeURIComponent(msg)}`;
-      try {
-        if (outWin) outWin.location.href = wa;
-        else window.open(wa, "_blank");
+        console.log("Cart closed successfully");
       } catch (e) {
-        window.open(wa, "_blank");
+        console.error("Error cerrando carrito:", e);
+      }
+
+      // Solicitar información del cliente
+      try {
+        console.log("Solicitando información del cliente...");
+        const customer = await collectCustomerInfo();
+        console.log("Cliente info obtenida:", customer);
+
+        if (customer === null) {
+          console.log("Checkout cancelado por el usuario");
+          return; // cancelado
+        }
+
+        const note = document.getElementById("note")
+          ? document.getElementById("note").value.trim()
+          : "";
+        const orderId = generateOrderId();
+        const now = new Date();
+        const dateStr = now.toLocaleString();
+
+        console.log("Generated order ID:", orderId);
+
+        let header = `FabricaMayorista\n`;
+        try {
+          const hasDanza = cart.some(
+            (i) =>
+              i &&
+              (i.category === "danza" ||
+                products.find((p) => p.code === i.code)?.category === "danza")
+          );
+          if (hasDanza) header += `Sección: Danza\n`;
+        } catch (e) {}
+        header += `Pedido: ${orderId}\n`;
+        header += `Fecha: ${dateStr}\n`;
+        if (customer.name) header += `Cliente: ${customer.name}\n`;
+        if (customer.city) header += `Ciudad: ${customer.city}\n`;
+        header += `------------------------------\n\n`;
+
+        let body = "";
+        let totalSavings = 0;
+
+        cart.forEach((i, idx) => {
+          const nameForMsg = getDisplayName(i);
+          const unitPrice = calculatePrice(
+            i.qty,
+            i.basePrice,
+            i.size,
+            i.category
+          );
+          const subtotal = unitPrice * i.qty;
+          const savings = (i.basePrice.retail - unitPrice) * i.qty;
+          totalSavings += savings;
+
+          // Determinar tier y emoji
+          const tierBadge =
+            i.qty >= 12 ? "DOCENA" : i.qty >= 3 ? "MAYOR" : "DETALLE";
+
+          body += `*${idx + 1}) ${nameForMsg}*\n`;
+          body += `   Código: ${i.code}\n`;
+          body += `   Talla: ${i.size}\n`;
+          body += `   Color: ${i.colorDisplay || i.colorKey}\n`;
+          body += `   Cantidad: ${i.qty} un. [${tierBadge}]\n`;
+          body += `   Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
+          body += `   Subtotal: RD$${subtotal.toFixed(2)}\n`;
+          if (savings > 0) {
+            body += `   Ahorro: RD$${savings.toFixed(2)}\n`;
+          }
+          body += `\n------------------------------\n`;
+        });
+
+        const total = cart.reduce(
+          (sum, i) =>
+            sum +
+            calculatePrice(i.qty, i.basePrice, i.size, i.category) * i.qty,
+          0
+        );
+
+        let footer = `\n*RESUMEN DEL PEDIDO*\n`;
+        footer += `Total: *RD$${total.toFixed(2)}*\n`;
+        if (totalSavings > 0) {
+          footer += `Ahorro total: *RD$${totalSavings.toFixed(2)}*\n`;
+        }
+        if (note) {
+          footer += `\n*Nota del cliente:*\n${note}\n`;
+        }
+        footer += `\nPrecios por docena, 12+\n`;
+        footer += `Envíos a toda República Dominicana\n`;
+        footer += `https://fabricamayorista.local`;
+
+        const msg = header + body + footer;
+
+        console.log(
+          "Generated WhatsApp message:",
+          msg.substring(0, 200) + "..."
+        );
+
+        // Abrir WhatsApp con texto solamente. Se abre una ventana nueva para evitar bloqueos.
+        const wa = `https://wa.me/18093027761?text=${encodeURIComponent(msg)}`;
+        console.log("Opening WhatsApp URL:", wa.substring(0, 100) + "...");
+
+        try {
+          window.open(wa, "_blank");
+          console.log("WhatsApp window opened successfully");
+        } catch (e) {
+          console.error("Error opening WhatsApp:", e);
+          alert("Error abriendo WhatsApp: " + e.message);
+        }
+      } catch (e) {
+        console.error("Error general en checkout:", e);
+        alert("Error procesando el pedido: " + e.message);
       }
     });
   }

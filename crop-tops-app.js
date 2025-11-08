@@ -1460,6 +1460,7 @@ function updateModalPrice() {
   if (!currentProduct) return;
   const unit = calculatePrice(quantity, currentProduct.price, selectedSize);
   const total = unit * quantity;
+
   // Actualizar precios del lado izquierdo
   const currentPriceLeft = document.getElementById("current-price-left");
   const totalPriceLeft = document.getElementById("total-price-left");
@@ -1484,125 +1485,127 @@ function updateModalPrice() {
       totalPriceLeft.textContent += ` (Ahorras RD$${savings})`;
     }
   }
+
+  // Actualizar precios en la tabla considerando el recargo de talla XL+
+  const retailEl = document.getElementById("price-retail");
+  const wholesaleEl = document.getElementById("price-wholesale");
+
+  if (retailEl) {
+    const retailPrice = calculatePrice(1, currentProduct.price, selectedSize);
+    retailEl.textContent = `RD$${retailPrice}`;
+  }
+
+  if (wholesaleEl) {
+    const wholesalePrice = calculatePrice(
+      3,
+      currentProduct.price,
+      selectedSize
+    );
+    wholesaleEl.textContent = `RD$${wholesalePrice}`;
+  }
+}
+
+// Función para mostrar alertas centrales más visibles
+function showCenterAlert(message, type = "warning") {
+  // Crear elemento de alerta central si no existe
+  let centerAlert = document.getElementById("center-alert");
+  if (!centerAlert) {
+    centerAlert = document.createElement("div");
+    centerAlert.id = "center-alert";
+    centerAlert.className = "center-alert";
+    document.body.appendChild(centerAlert);
+  }
+
+  // Configurar el mensaje y tipo
+  centerAlert.textContent = message;
+  centerAlert.className = `center-alert ${type}`;
+  centerAlert.style.display = "block";
+
+  // Auto-ocultar después de 3 segundos
+  setTimeout(() => {
+    if (centerAlert) {
+      centerAlert.style.display = "none";
+    }
+  }, 3000);
 }
 
 // Validar selecciones obligatorias
 function validateSelections() {
-  let isValid = true;
-
-  // Validar tallas
+  // Validar tallas - OBLIGATORIO
   const sizeError = document.getElementById("size-error");
   let missingSize = false;
 
   if (quantity > 1) {
+    // Para múltiples artículos, verificar que tenemos exactamente la cantidad de tallas
     missingSize =
       selectedSizes.length !== quantity ||
       selectedSizes.some(
         (size) => !size || size === null || size === undefined
       );
   } else {
+    // Para un solo artículo, verificar que hay talla seleccionada
     missingSize =
       !selectedSize || selectedSize === null || selectedSize === undefined;
   }
 
   if (missingSize) {
     if (sizeError) sizeError.style.display = "block";
-    isValid = false;
-  } else {
-    if (sizeError) sizeError.style.display = "none";
-  }
-
-  if (missingSize) {
-    const actions = [];
-    if (currentProduct && Array.isArray(currentProduct.sizes)) {
-      currentProduct.sizes.forEach((sz) => {
-        actions.push({
-          label: sz,
-          onClick: () => {
-            const btn = Array.from(document.querySelectorAll(".size-btn")).find(
-              (b) => (b.textContent || "").trim() === sz
-            );
-            selectSize(sz, btn);
-          },
-        });
-      });
-    }
-    try {
-      showAlert("Selecciona tu talla", actions);
-    } catch (e) {
-      alert("Selecciona tu talla");
-    }
+    showCenterAlert(
+      "Por favor selecciona la talla para todos los artículos",
+      "warning"
+    );
     return false;
+  } else if (sizeError) {
+    sizeError.style.display = "none";
   }
 
-  // Validar color - OBLIGATORIO para bodys (001-008)
-  const isBodyProduct =
-    currentProduct &&
-    currentProduct.id &&
-    parseInt(currentProduct.id, 10) >= 1 &&
-    parseInt(currentProduct.id, 10) <= 8;
+  // Validar colores - OBLIGATORIO para TODOS los productos
+  const colorError = document.getElementById("color-error");
 
-  if (isBodyProduct) {
-    // Para bodys, el color es SIEMPRE obligatorio
-    const colorError = document.getElementById("color-error");
-    const hasColor =
-      isCustomColor ||
-      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
+  if (quantity > 1) {
+    // Para múltiples artículos, verificar que todos tengan color seleccionado
+    const missingColors =
+      selectedColors.length !== quantity ||
+      selectedColors.some((c) => !c || c === null || c === undefined);
 
-    if (!hasColor) {
+    if (missingColors) {
       if (colorError) colorError.style.display = "block";
-      const actions = [
-        {
-          label: "Elegir color",
-          onClick: () => {
-            const el = document.getElementById("color-swatches");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-          },
-        },
-      ];
-      try {
-        showAlert("Por favor selecciona un color antes de continuar", actions);
-      } catch (e) {
-        alert("Por favor selecciona un color");
-      }
+      showCenterAlert(
+        "Por favor selecciona el color para todos los artículos",
+        "warning"
+      );
       return false;
-    } else {
-      if (colorError) colorError.style.display = "none";
-    }
-  } else if (quantity > 1) {
-    // Para otros productos, requerir color solo en múltiples artículos
-    const colorError = document.getElementById("color-error");
-    const hasColor =
-      isCustomColor ||
-      (selectedColor && selectedColor !== "default" && selectedColor !== "N/A");
-    if (!hasColor) {
-      if (colorError) colorError.style.display = "block";
-      const actions = [
-        {
-          label: "Elegir color",
-          onClick: () => {
-            const el = document.getElementById("color-swatches");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-          },
-        },
-      ];
-      try {
-        showAlert("Selecciona un color para los artículos múltiples", actions);
-      } catch (e) {
-        alert("Selecciona un color");
-      }
-      return false;
-    } else {
-      if (colorError) colorError.style.display = "none";
     }
   } else {
-    // Para productos que no son bodys ni múltiples artículos, ocultar error de color
-    const colorError = document.getElementById("color-error");
-    if (colorError) colorError.style.display = "none";
+    // Para un solo artículo, verificar color
+    const hasColor =
+      isCustomColor ||
+      (selectedColor &&
+        selectedColor !== "default" &&
+        selectedColor !== "N/A" &&
+        selectedColor !== null);
+
+    if (!hasColor) {
+      if (colorError) colorError.style.display = "block";
+      showCenterAlert(
+        "Por favor selecciona un color para el artículo",
+        "warning"
+      );
+      return false;
+    }
   }
 
-  return isValid;
+  if (colorError) colorError.style.display = "none";
+  return true;
 }
+onClick: () => {
+  const btn = Array.from(document.querySelectorAll(".size-btn")).find(
+    (b) => (b.textContent || "").trim() === sz
+  );
+  selectSize(sz, btn);
+  // Los crop tops no requieren color obligatorio
+  return true;
+};
 
 // Compra directa por WhatsApp
 function generateOrderId() {

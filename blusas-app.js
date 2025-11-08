@@ -1108,6 +1108,30 @@ function updateTotalPrice() {
   }
 }
 
+// Función para mostrar alertas centrales más visibles
+function showCenterAlert(message, type = "warning") {
+  // Crear elemento de alerta central si no existe
+  let centerAlert = document.getElementById("center-alert");
+  if (!centerAlert) {
+    centerAlert = document.createElement("div");
+    centerAlert.id = "center-alert";
+    centerAlert.className = "center-alert";
+    document.body.appendChild(centerAlert);
+  }
+
+  // Configurar el mensaje y tipo
+  centerAlert.textContent = message;
+  centerAlert.className = `center-alert ${type}`;
+  centerAlert.style.display = "block";
+
+  // Auto-ocultar después de 3 segundos
+  setTimeout(() => {
+    if (centerAlert) {
+      centerAlert.style.display = "none";
+    }
+  }, 3000);
+}
+
 function addToCartFromModal() {
   if (!currentProduct) return;
   __lastIntent = __lastIntent || "add";
@@ -1116,30 +1140,14 @@ function addToCartFromModal() {
     const colorError = document.getElementById("color-error");
     if (colorError) colorError.style.display = "block";
     __autoAddAfterValidation = true;
-    showAlert("Por favor selecciona un color", [
-      {
-        label: "Elegir color",
-        action: () => {
-          const el = document.getElementById("color-swatches");
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-          closeAlert();
-        },
-      },
-    ]);
+    showCenterAlert("Por favor selecciona un color", "warning");
     return;
   }
   if (!selectedSize) {
     const sizeError = document.getElementById("size-error");
     if (sizeError) sizeError.style.display = "block";
     __autoAddAfterValidation = true;
-    const actions = (currentProduct.sizes || []).map((s) => ({
-      label: s,
-      action: () => {
-        selectSize(s);
-        closeAlert();
-      },
-    }));
-    showAlert("Selecciona tu talla", actions);
+    showCenterAlert("Por favor selecciona una talla", "warning");
     return;
   }
 

@@ -1678,10 +1678,105 @@ function renderCropTops() {
   }, 80);
 }
 
+// Configurar event listeners del carrito
+function setupCartEventListeners() {
+  console.log("setupCartEventListeners() llamada");
+  
+  // Configurar event listener para el botón de cerrar
+  const closeCartBtn = document.getElementById("close-cart");
+  console.log("closeCartBtn encontrado:", closeCartBtn);
+  if (closeCartBtn && !closeCartBtn.dataset.listenerConfigured) {
+    closeCartBtn.addEventListener("click", closeCart);
+    closeCartBtn.dataset.listenerConfigured = "true";
+    console.log("Event listener para close-cart configurado");
+  }
+
+  // Configurar event listener para el botón de checkout
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  console.log("checkoutBtn encontrado:", checkoutBtn);
+  if (checkoutBtn && !checkoutBtn.dataset.listenerConfigured) {
+    checkoutBtn.addEventListener("click", async () => {
+      console.log("Checkout button clicked");
+
+      if (cart.length === 0) {
+        showCenterAlert("El carrito está vacío", "warning");
+        return;
+      }
+
+      console.log("Cart has items:", cart.length);
+
+      // Cerrar el carrito para que el formulario no quede tapado
+      try {
+        closeCart();
+        console.log("Cart closed successfully");
+      } catch (e) {
+        console.error("Error cerrando carrito:", e);
+      }
+
+      // Solicitar información del cliente
+      try {
+        console.log("Solicitando información del cliente...");
+        const customer = await collectCustomerInfo();
+        console.log("Cliente info obtenida:", customer);
+
+        if (customer === null) {
+          console.log("Checkout cancelado por el usuario");
+          return; // cancelado
+        }
+
+        if (!customer.name || !customer.city) {
+          showCenterAlert("Por favor completa tu nombre y ciudad", "warning");
+          return;
+        }
+
+        // Continuar con WhatsApp
+        sendWhatsAppOrder(customer);
+      } catch (error) {
+        console.error("Error en checkout:", error);
+        showCenterAlert("Error al procesar el pedido", "error");
+      }
+    });
+    checkoutBtn.dataset.listenerConfigured = "true";
+    console.log("Event listener para checkout configurado");
+  }
+}
+
+// Resto del código para ensureSharedUI continúa aquí
+function configureCartOverlayAndSidebar() {
+  // Cerrar carrito al click del overlay
+  const overlay = document.getElementById("cart-overlay");
+  if (overlay && !overlay.dataset.bound) {
+    overlay.addEventListener("click", () => {
+      const sidebar = document.getElementById("cart-sidebar");
+      if (sidebar && sidebar.classList.contains("active")) {
+        toggleCart();
+      }
+    });
+    overlay.dataset.bound = "1";
+  }
+
+  // Evitar que clics dentro del carrito propaguen al documento y lo cierren
+  const sidebar = document.getElementById("cart-sidebar");
+  if (sidebar && !sidebar.dataset._stopPropagationBound) {
+    sidebar.addEventListener("click", (e) => e.stopPropagation());
+    sidebar.dataset._stopPropagationBound = "1";
+  }
+
+  // Asegurar que si el sidebar ya existía, tenga el stopPropagation aplicado
+  const existingSidebar = document.getElementById("cart-sidebar");
+  if (existingSidebar && !existingSidebar.dataset._stopPropagationBound) {
+    existingSidebar.addEventListener("click", (e) => e.stopPropagation());
+    existingSidebar.dataset._stopPropagationBound = "1";
+  }
+}
+
 // Ensure the shared UI elements (cart sidebar and product modal) exist in the document.
 function ensureSharedUI() {
+  console.log("ensureSharedUI() llamada");
+  
   // cart-sidebar
   if (!document.getElementById("cart-sidebar")) {
+    console.log("Creando cart-sidebar...");
     const cartHtml = `
       <div id="cart-overlay" class="cart-overlay"></div>
       <aside class="cart-sidebar-professional" id="cart-sidebar">
@@ -1707,41 +1802,15 @@ function ensureSharedUI() {
         </div>
       </aside>`;
     document.body.insertAdjacentHTML("beforeend", cartHtml);
-
-    // Configurar event listener para el botón de cerrar DESPUÉS de crear el HTML
-    const closeCartBtn = document.getElementById("close-cart");
-    if (closeCartBtn) {
-      closeCartBtn.addEventListener("click", closeCart);
-      console.log("Event listener para close-cart configurado");
-    } else {
-      console.error("No se encontró el botón close-cart");
-    }
-
-    // Cerrar carrito al click del overlay
-    const overlay = document.getElementById("cart-overlay");
-    if (overlay && !overlay.dataset.bound) {
-      overlay.addEventListener("click", () => {
-        const sidebar = document.getElementById("cart-sidebar");
-        if (sidebar && sidebar.classList.contains("active")) {
-          toggleCart();
-        }
-      });
-      overlay.dataset.bound = "1";
-    }
-
-    // Evitar que clics dentro del carrito propaguen al documento y lo cierren
-    const sidebar = document.getElementById("cart-sidebar");
-    if (sidebar && !sidebar.dataset._stopPropagationBound) {
-      sidebar.addEventListener("click", (e) => e.stopPropagation());
-      sidebar.dataset._stopPropagationBound = "1";
-    }
+    console.log("Cart HTML insertado, configurando listeners...");
+  } else {
+    console.log("Cart-sidebar ya existe");
   }
-  // Asegurar que si el sidebar ya existía, tenga el stopPropagation aplicado
-  const existingSidebar = document.getElementById("cart-sidebar");
-  if (existingSidebar && !existingSidebar.dataset._stopPropagationBound) {
-    existingSidebar.addEventListener("click", (e) => e.stopPropagation());
-    existingSidebar.dataset._stopPropagationBound = "1";
-  }
+  
+  // SIEMPRE configurar event listeners (tanto si se crea como si ya existe)
+  setupCartEventListeners();
+  configureCartOverlayAndSidebar();
+  console.log("Event listeners configurados");
 
   // product-modal
   if (!document.getElementById("product-modal")) {
@@ -2111,6 +2180,9 @@ function hideCenterAlert() {
 
 // Toggle cart sidebar
 function toggleCart() {
+  // Asegurar que el carrito existe antes de intentar abrirlo
+  ensureSharedUI();
+  
   const sidebar = document.getElementById("cart-sidebar");
   if (!sidebar) return;
   const opening = !sidebar.classList.contains("active");
@@ -3720,6 +3792,56 @@ async function buyNowFromModal() {
   closeModal();
 }
 
+function sendWhatsAppOrder(customer) {
+  if (cart.length === 0) {
+    showCenterAlert("El carrito está vacío", "warning");
+    return;
+  }
+
+  const orderId = "FM-" + Date.now().toString().slice(-6);
+  let message = `🛍️ NUEVO PEDIDO - ${orderId}\n\n`;
+  
+  message += `👤 CLIENTE:\n`;
+  message += `Nombre: ${customer.name}\n`;
+  message += `Ciudad: ${customer.city}\n\n`;
+  
+  message += `📦 PRODUCTOS:\n`;
+  
+  let total = 0;
+  cart.forEach((item, index) => {
+    message += `${index + 1}. ${item.name || 'Producto'}\n`;
+    message += `   Código: ${item.code || 'N/A'}\n`;
+    message += `   Color: ${item.colorName || item.color || 'Original'}\n`;
+    message += `   Talla: ${item.size}\n`;
+    message += `   Cantidad: ${item.quantity}\n`;
+    message += `   Precio: RD$${item.price.toFixed(2)} c/u\n`;
+    message += `   Subtotal: RD$${item.total.toFixed(2)}\n\n`;
+    total += item.total;
+  });
+
+  // Agregar nota si existe
+  const noteTextarea = document.getElementById("note");
+  if (noteTextarea && noteTextarea.value.trim()) {
+    message += `📝 NOTA ESPECIAL:\n${noteTextarea.value.trim()}\n\n`;
+  }
+
+  message += `💰 TOTAL: RD$${total.toFixed(2)}\n\n`;
+  message += `📞 ¡Gracias por tu pedido!\n`;
+  message += `Fabricamayorista.com`;
+
+  const whatsappUrl = `https://wa.me/18093027761?text=${encodeURIComponent(message)}`;
+  
+  // Limpiar carrito después de enviar
+  cart = [];
+  saveCart();
+  renderCart();
+  
+  // Abrir WhatsApp
+  window.open(whatsappUrl, "_blank");
+  
+  showCenterAlert("Pedido enviado a WhatsApp exitosamente", "success");
+}
+
 function addToCartFromModal() {
   __lastIntent = "add";
   if (!currentProduct) return;
@@ -4300,138 +4422,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCategoryGrid(pageCategory);
     }
   } catch (e) {}
-
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", async () => {
-      console.log("Checkout button clicked");
-
-      if (cart.length === 0) {
-        alert("Carrito vacío");
-        return;
-      }
-
-      console.log("Cart has items:", cart.length);
-
-      // Cerrar el carrito para que el formulario no quede tapado
-      try {
-        closeCart();
-        console.log("Cart closed successfully");
-      } catch (e) {
-        console.error("Error cerrando carrito:", e);
-      }
-
-      // Solicitar información del cliente
-      try {
-        console.log("Solicitando información del cliente...");
-        const customer = await collectCustomerInfo();
-        console.log("Cliente info obtenida:", customer);
-
-        if (customer === null) {
-          console.log("Checkout cancelado por el usuario");
-          return; // cancelado
-        }
-
-        const note = document.getElementById("note")
-          ? document.getElementById("note").value.trim()
-          : "";
-        const orderId = generateOrderId();
-        const now = new Date();
-        const dateStr = now.toLocaleString();
-
-        console.log("Generated order ID:", orderId);
-
-        let header = `FabricaMayorista\n`;
-        try {
-          const hasDanza = cart.some(
-            (i) =>
-              i &&
-              (i.category === "danza" ||
-                products.find((p) => p.code === i.code)?.category === "danza")
-          );
-          if (hasDanza) header += `Sección: Danza\n`;
-        } catch (e) {}
-        header += `Pedido: ${orderId}\n`;
-        header += `Fecha: ${dateStr}\n`;
-        if (customer.name) header += `Cliente: ${customer.name}\n`;
-        if (customer.city) header += `Ciudad: ${customer.city}\n`;
-        header += `------------------------------\n\n`;
-
-        let body = "";
-        let totalSavings = 0;
-
-        cart.forEach((i, idx) => {
-          const nameForMsg = getDisplayName(i);
-          const unitPrice = calculatePrice(
-            i.qty,
-            i.basePrice,
-            i.size,
-            i.category
-          );
-          const subtotal = unitPrice * i.qty;
-          const savings = (i.basePrice.retail - unitPrice) * i.qty;
-          totalSavings += savings;
-
-          // Determinar tier y emoji
-          const tierBadge =
-            i.qty >= 12 ? "DOCENA" : i.qty >= 3 ? "MAYOR" : "DETALLE";
-
-          body += `*${idx + 1}) ${nameForMsg}*\n`;
-          body += `   Código: ${i.code}\n`;
-          body += `   Talla: ${i.size}\n`;
-          body += `   Color: ${i.colorDisplay || i.colorKey}\n`;
-          body += `   Cantidad: ${i.qty} un. [${tierBadge}]\n`;
-          body += `   Precio: RD$${unitPrice.toFixed(2)} c/u\n`;
-          body += `   Subtotal: RD$${subtotal.toFixed(2)}\n`;
-          if (savings > 0) {
-            body += `   Ahorro: RD$${savings.toFixed(2)}\n`;
-          }
-          body += `\n------------------------------\n`;
-        });
-
-        const total = cart.reduce(
-          (sum, i) =>
-            sum +
-            calculatePrice(i.qty, i.basePrice, i.size, i.category) * i.qty,
-          0
-        );
-
-        let footer = `\n*RESUMEN DEL PEDIDO*\n`;
-        footer += `Total: *RD$${total.toFixed(2)}*\n`;
-        if (totalSavings > 0) {
-          footer += `Ahorro total: *RD$${totalSavings.toFixed(2)}*\n`;
-        }
-        if (note) {
-          footer += `\n*Nota del cliente:*\n${note}\n`;
-        }
-        footer += `\nPrecios por docena, 12+\n`;
-        footer += `Envíos a toda República Dominicana\n`;
-        footer += `https://fabricamayorista.local`;
-
-        const msg = header + body + footer;
-
-        console.log(
-          "Generated WhatsApp message:",
-          msg.substring(0, 200) + "..."
-        );
-
-        // Abrir WhatsApp con texto solamente. Se abre una ventana nueva para evitar bloqueos.
-        const wa = `https://wa.me/18093027761?text=${encodeURIComponent(msg)}`;
-        console.log("Opening WhatsApp URL:", wa.substring(0, 100) + "...");
-
-        try {
-          window.open(wa, "_blank");
-          console.log("WhatsApp window opened successfully");
-        } catch (e) {
-          console.error("Error opening WhatsApp:", e);
-          alert("Error abriendo WhatsApp: " + e.message);
-        }
-      } catch (e) {
-        console.error("Error general en checkout:", e);
-        alert("Error procesando el pedido: " + e.message);
-      }
-    });
-  }
 
   const productModal = document.getElementById("product-modal");
   if (productModal)

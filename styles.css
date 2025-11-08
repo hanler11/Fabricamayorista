@@ -1133,6 +1133,12 @@ textarea {
   border: 2px solid #444444;
 }
 
+.center-alert.success {
+  background: #f8f9fa;
+  color: #155724;
+  border: 2px solid #28a745;
+}
+
 @keyframes alertPulse {
   0% {
     transform: translate(-50%, -50%) scale(0.8);
